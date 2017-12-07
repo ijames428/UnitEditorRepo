@@ -1,0 +1,16 @@
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\bin\Debug\UnitEditor.exe.config
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\bin\Debug\UnitEditor.exe
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\bin\Debug\UnitEditor.pdb
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\MainWindow.g.cs
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\App.g.cs
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\UnitEditor_MarkupCompile.cache
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\UnitEditor_MarkupCompile.lref
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\MainWindow.baml
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\UnitEditor.g.resources
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\UnitEditor.Properties.Resources.resources
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\UnitEditor.csproj.GenerateResource.Cache
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\UnitEditor.exe
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\UnitEditor.pdb
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Ian\Documents\GitHub\UnitEditorRepo\UnitEditor\UnitEditor\obj\Debug\UnitEditor.csprojResolveAssemblyReference.cache

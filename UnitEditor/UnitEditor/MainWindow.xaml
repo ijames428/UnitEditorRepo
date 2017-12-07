@@ -1,0 +1,43 @@
+﻿<Window x:Class="UnitEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnitEditor"
+        mc:Ignorable="d" Closing="DataWindow_Closing"
+        Title="MainWindow" d:DesignWidth="1313.902" d:DesignHeight="773.948">
+	<Grid>
+		<Canvas Name="UiCanvas">
+			<Button Name="NewButton" Height="25" Width="80" Click="New">New Bestiary</Button>
+			<Button Name="OpenButton" Height="25" Width="80" Click="Open" Canvas.Left="80">Open Bestiary</Button>
+			<Button Name="SaveButton" Height="25" Width="80" Click="Save" Canvas.Left="160" IsEnabled="False">Save Bestiary</Button>
+
+			<Label Name="BestiaryNameLabel" Canvas.Top="24">(No Bestiary open, currently)</Label>
+			<TextBox Name="BestiaryNameTextBox" Canvas.Top="25" Height="25" Width="150" KeyDown="OnKeyDownHandler" Visibility="Hidden"></TextBox>
+			<Button Name="ConfirmNameButton" Height="25" Width="50" Click="ConfirmNameButton_Click" Canvas.Left="150" Canvas.Top="25" Visibility="Hidden">Confirm</Button>
+			<Button Name="CancelNameButton" Height="25" Width="40" Click="CancelNameButton_Click" Canvas.Left="200" Canvas.Top="25" Visibility="Hidden">Cancel</Button>
+			<Button Name="CreateUnitButton" Height="25" Width="80" Click="CreateUnit" Canvas.Top="51" IsEnabled="False">Create Unit</Button>
+
+			<ListBox Name="ListOfUnits" Canvas.Top="76" Height="300" Width="240" IsEnabled="False">
+			</ListBox>
+
+			<ListBox Name="ListOfStates" Canvas.Top="10" Height="162" Width="104" IsEnabled="False" Canvas.Right="10">
+				<ListBoxItem Name="IdleState" Content="Idle" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="WalkState" Content="Walk" Selected="OnStateSelected"></ListBoxItem>
+			</ListBox>
+
+			<Button Name="AddAnimationButton" Height="25" Width="90" Click="AddAnimationButton_Click" Canvas.Right="120" Canvas.Top="185">Add Animation</Button>
+			<ListBox Name="ListOfStateAnimations" Canvas.Top="215" Height="162" Width="200" IsEnabled="False" Canvas.Right="10"></ListBox>
+			<Label Name="numberOfFramesLabel" Canvas.Right="82" Canvas.Top="378">Number of Frames:</Label>
+			<TextBox Name="numberOfFramesTextBox" Canvas.Right="10" Canvas.Top="382" Width="75"></TextBox>
+			<!--Label Name="yLabel" Canvas.Right="180" Canvas.Top="368">Y:</>
+			<TextBox Name="yTextBox" Canvas.Right="105" Canvas.Top="372" Width="75"></TextBox-->
+			<Label Name="frameWidthLabel" Canvas.Right="82" Canvas.Top="396">Frame Width:</Label>
+			<TextBox Name="frameWidthTextBox" Canvas.Right="10" Canvas.Top="400" Width="75"></TextBox>
+			<Label Name="frameHeightLabel"  Canvas.Right="82" Canvas.Top="414">Frame Height:</Label>
+			<TextBox Name="frameHeightTextBox" Canvas.Right="10" Canvas.Top="418" Width="75"></TextBox>
+		</Canvas>
+		<Canvas Name="FrameCanvas" Background="Black" Margin="250, 10, 220, 10">
+		</Canvas>
+	</Grid>
+</Window>
