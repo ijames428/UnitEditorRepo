@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using System.IO;
 using Microsoft.Win32;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace UnitEditor
 {
@@ -26,10 +27,75 @@ namespace UnitEditor
 	{
 		bool isDataDirty = false;
 		string currentlySelectedState = "";
-		//bool saveButtonWasEnabled = false;
+		int currentFrameCount = 0;
+
+		CroppedBitmap animatedSprite;
+		Image spriteImage = new Image();
+		BitmapImage bitmap;
 
 		Bestiary MyBestiary;
 		Unit SelectedUnit;
+		
+		System.Windows.Threading.DispatcherTimer updateTimer = new System.Windows.Threading.DispatcherTimer();
+		System.Windows.Threading.DispatcherTimer drawTimer = new System.Windows.Threading.DispatcherTimer();
+
+		private void Update(object sender, EventArgs e)
+		{
+			drawTimer.Interval = TimeSpan.FromSeconds(1.0 / (FramesPerSecond));
+		}
+
+		private void Draw(object sender, EventArgs e)
+		{
+			if (animatedSprite != null)
+			{
+				try
+				{
+					int y = (currentFrameCount / FramesPerRow) * FrameHeight;
+					animatedSprite = new CroppedBitmap(bitmap, new Int32Rect((currentFrameCount % FramesPerRow) * FrameWidth, y, FrameWidth, FrameHeight));
+				}
+				catch (Exception exception)
+				{
+
+				}
+				
+				double maxX = FrameCanvas.ActualWidth / 2.0 - animatedSprite.PixelWidth / 2.0;
+				double maxY = FrameCanvas.ActualHeight / 2.0 - animatedSprite.PixelHeight / 2.0;
+				
+				spriteImage.Source = animatedSprite;
+				spriteImage.Width = animatedSprite.PixelWidth;
+				spriteImage.Height = animatedSprite.PixelWidth;
+				Canvas.SetLeft(spriteImage, maxX);
+				Canvas.SetTop(spriteImage, maxY);
+
+				FrameCanvas.Children.Clear();
+				FrameCanvas.Children.Add(spriteImage);
+
+				currentFrameCount++;
+
+				if (currentFrameCount >= NumberOfFrames)
+				{
+					currentFrameCount = 0;
+				}
+			}
+		}
+
+		private void OpenAndShowImage(string filepath)
+		{
+			bitmap = new BitmapImage(new Uri(filepath, UriKind.Absolute));
+			animatedSprite = new CroppedBitmap(bitmap, new Int32Rect(0, 0, 500, 500));
+
+			//double maxX = FrameCanvas.ActualWidth / 2.0 - animatedSprite.Width / 2.0;
+			//double maxY = FrameCanvas.ActualHeight / 2.0 - animatedSprite.Height / 2.0;
+			//
+			//spriteImage.Source = animatedSprite;
+			//spriteImage.Width = animatedSprite.Width;
+			//spriteImage.Height = animatedSprite.Height;
+			//Canvas.SetLeft(spriteImage, maxX);
+			//Canvas.SetTop(spriteImage, maxY);
+
+			FrameCanvas.Children.Clear();
+			FrameCanvas.Children.Add(spriteImage);
+		}
 
 		public MainWindow()
 		{
@@ -40,6 +106,14 @@ namespace UnitEditor
 			Show();
 
 			MyBestiary = new Bestiary();
+
+			updateTimer.Tick += Update;
+			updateTimer.Interval = TimeSpan.FromSeconds(1.0 / 30.0);
+			updateTimer.Start();
+
+			drawTimer.Tick += Draw;
+			drawTimer.Interval = TimeSpan.FromSeconds(1.0 / 30.0);
+			drawTimer.Start();
 		}
 
 		private void New(object sender, RoutedEventArgs e)
@@ -145,18 +219,18 @@ namespace UnitEditor
 				stateAnimationItem.Unselected += OnAnimationUnselected;
 
 				ListOfStateAnimations.Items.Add(stateAnimationItem);
-
-				numberOfFramesTextBox.Text = unitsStateAnimationList[i].NumberOfFrames.ToString();
-				frameWidthTextBox.Text = unitsStateAnimationList[i].FrameDimensionsX.ToString();
-				frameHeightTextBox.Text = unitsStateAnimationList[i].FrameDimensionsY.ToString();
-
-				OpenAndShowImage(unitsStateAnimationList[i].FilePath);
 			}
 
 			if (ListOfStateAnimations.Items.Count > 0)
 			{
 				ListBoxItem stateAnimationItem = (ListBoxItem)ListOfStateAnimations.Items[0];
 				stateAnimationItem.IsSelected = true;
+
+				numberOfFramesTextBox.Text = unitsStateAnimationList[0].NumberOfFrames.ToString();
+				frameWidthTextBox.Text = unitsStateAnimationList[0].FrameDimensionsX.ToString();
+				frameHeightTextBox.Text = unitsStateAnimationList[0].FrameDimensionsY.ToString();
+				framesPerRowTextBox.Text = unitsStateAnimationList[0].FramesPerRow.ToString();
+				framesPerColumnTextBox.Text = unitsStateAnimationList[0].FramesPerColumn.ToString();
 			}
 
 			//DeselectUnit();
@@ -192,6 +266,12 @@ namespace UnitEditor
 					numberOfFramesTextBox.Text = unitsStateAnimationList[i].NumberOfFrames.ToString();
 					frameWidthTextBox.Text = unitsStateAnimationList[i].FrameDimensionsX.ToString();
 					frameHeightTextBox.Text = unitsStateAnimationList[i].FrameDimensionsY.ToString();
+					framesPerRowTextBox.Text = unitsStateAnimationList[i].FramesPerRow.ToString();
+					framesPerColumnTextBox.Text = unitsStateAnimationList[i].FramesPerColumn.ToString();
+
+					OpenAndShowImage(unitsStateAnimationList[i].FilePath);
+
+					break;
 				}
 			}
 
@@ -361,6 +441,130 @@ namespace UnitEditor
 			}
 		}
 
+		private int NumberOfFrames
+		{
+			get
+			{
+				if (numberOfFramesTextBox.Text == string.Empty)
+				{
+					return 1;
+				}
+
+				int frames = 1;
+				if (int.TryParse(numberOfFramesTextBox.Text, out frames))
+				{
+					return frames;
+				}
+
+				return 1;
+			}
+		}
+
+		private int FramesPerSecond
+		{
+			get
+			{
+				if (framesPerSecondTextBox.Text == string.Empty)
+				{
+					return 1;
+				}
+
+				int frames = 1;
+				if (int.TryParse(framesPerSecondTextBox.Text, out frames))
+				{
+					return frames;
+				}
+
+				return 1;
+			}
+		}
+
+		private int FramesPerRow
+		{
+			get
+			{
+				if (framesPerRowTextBox.Text == string.Empty)
+				{
+					return 0;
+				}
+
+				int frames = 0;
+				if (int.TryParse(framesPerRowTextBox.Text, out frames))
+				{
+					return frames;
+				}
+
+				return 0;
+			}
+		}
+
+		private int FramesPerColumn
+		{
+			get
+			{
+				if (framesPerColumnTextBox.Text == string.Empty)
+				{
+					return 0;
+				}
+
+				int frames = 0;
+				if (int.TryParse(framesPerColumnTextBox.Text, out frames))
+				{
+					return frames;
+				}
+
+				return 0;
+			}
+		}
+
+		private int FrameWidth
+		{
+			get
+			{
+				if (frameWidthTextBox.Text == string.Empty)
+				{
+					return 1;
+				}
+
+				int frames = 1;
+				if (int.TryParse(frameWidthTextBox.Text, out frames))
+				{
+					if (frames == 0)
+					{
+						return 1;
+					}
+
+					return frames;
+				}
+
+				return 1;
+			}
+		}
+
+		private int FrameHeight
+		{
+			get
+			{
+				if (frameHeightTextBox.Text == string.Empty)
+				{
+					return 1;
+				}
+
+				int frames = 1;
+				if (int.TryParse(frameHeightTextBox.Text, out frames))
+				{
+					if (frames == 0)
+					{
+						return 1;
+					}
+
+					return frames;
+				}
+
+				return 1;
+			}
+		}
+
 		//private void StateSelected(object sender, RoutedEventArgs e)
 		//{
 		//	ListBoxItem item = (ListBoxItem)sender;
@@ -377,19 +581,24 @@ namespace UnitEditor
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				BitmapImage bitmap = OpenAndShowImage(openFileDialog.FileName);
+				OpenAndShowImage(openFileDialog.FileName);
 
 				StateAnimation newStateAnimation = new StateAnimation();
 				newStateAnimation.FilePath = openFileDialog.FileName;
 				newStateAnimation.NumberOfFrames = 1;
 				newStateAnimation.FrameDimensionsX = 10;
 				newStateAnimation.FrameDimensionsY = 10;
-				newStateAnimation.SourceDimensionsX = (int)bitmap.PixelWidth;
-				newStateAnimation.SourceDimensionsX = (int)bitmap.PixelHeight;
+				newStateAnimation.FramesPerRow = 1;
+				newStateAnimation.FramesPerColumn = 1;
+				newStateAnimation.SourceDimensionsX = (int)animatedSprite.PixelWidth;
+				newStateAnimation.SourceDimensionsX = (int)animatedSprite.PixelHeight;
 
 				numberOfFramesTextBox.Text = newStateAnimation.NumberOfFrames.ToString();
 				frameWidthTextBox.Text = newStateAnimation.FrameDimensionsX.ToString();
 				frameHeightTextBox.Text = newStateAnimation.FrameDimensionsY.ToString();
+				framesPerRowTextBox.Text = newStateAnimation.FramesPerRow.ToString();
+				framesPerColumnTextBox.Text = newStateAnimation.FramesPerColumn.ToString();
+				framesPerSecondTextBox.Text = "1";
 
 				ListBoxItem item = new ListBoxItem();
 				item.Content = newStateAnimation.FilePath;
@@ -402,24 +611,6 @@ namespace UnitEditor
 
 				AddStateAnimationToSelectedUnitsState(newStateAnimation);
 			}
-		}
-
-		private BitmapImage OpenAndShowImage(string filepath)
-		{
-			BitmapImage bitmap = new BitmapImage(new Uri(filepath, UriKind.Absolute));
-			Image image = new Image();
-
-			double maxX = FrameCanvas.ActualWidth / 2.0 - bitmap.Width / 2.0;
-			double maxY = FrameCanvas.ActualHeight / 2.0 - bitmap.Height / 2.0;
-
-			image.Source = bitmap;
-			image.Width = bitmap.Width;
-			image.Height = bitmap.Height;
-			Canvas.SetLeft(image, maxX);
-			Canvas.SetTop(image, maxY);
-			FrameCanvas.Children.Add(image);
-
-			return bitmap;
 		}
 
 		private void AddStateAnimationToSelectedUnitsState(StateAnimation stateAnimation)
@@ -468,6 +659,8 @@ namespace UnitEditor
 		public int SourceDimensionsY = 0;
 		public int FrameDimensionsX = 0;
 		public int FrameDimensionsY = 0;
+		public int FramesPerRow = 0;
+		public int FramesPerColumn = 0;
 
 		public StateAnimation()
 		{

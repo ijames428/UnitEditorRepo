@@ -30,12 +30,17 @@
 			<ListBox Name="ListOfStateAnimations" Canvas.Top="215" Height="162" Width="200" IsEnabled="False" Canvas.Right="10"></ListBox>
 			<Label Name="numberOfFramesLabel" Canvas.Right="82" Canvas.Top="378">Number of Frames:</Label>
 			<TextBox Name="numberOfFramesTextBox" Canvas.Right="10" Canvas.Top="382" Width="75"></TextBox>
-			<!--Label Name="yLabel" Canvas.Right="180" Canvas.Top="368">Y:</>
-			<TextBox Name="yTextBox" Canvas.Right="105" Canvas.Top="372" Width="75"></TextBox-->
 			<Label Name="frameWidthLabel" Canvas.Right="82" Canvas.Top="396">Frame Width:</Label>
 			<TextBox Name="frameWidthTextBox" Canvas.Right="10" Canvas.Top="400" Width="75"></TextBox>
 			<Label Name="frameHeightLabel"  Canvas.Right="82" Canvas.Top="414">Frame Height:</Label>
 			<TextBox Name="frameHeightTextBox" Canvas.Right="10" Canvas.Top="418" Width="75"></TextBox>
+			<Label Name="framesPerRowLabel" Canvas.Right="82" Canvas.Top="432">Frames Per Row:</Label>
+			<TextBox Name="framesPerRowTextBox" Canvas.Right="10" Canvas.Top="436" Width="75"></TextBox>
+			<Label Name="framesPerColumnLabel"  Canvas.Right="82" Canvas.Top="450">Frame Per Col:</Label>
+			<TextBox Name="framesPerColumnTextBox" Canvas.Right="10" Canvas.Top="454" Width="75"></TextBox>
+			
+			<Label Name="framesPerSecondLabel" Canvas.Right="82" Canvas.Top="480">Frame Per Second:</Label>
+			<TextBox Name="framesPerSecondTextBox" Canvas.Right="50" Canvas.Top="484" Width="35"></TextBox>
 		</Canvas>
 		<Canvas Name="FrameCanvas" Background="Black" Margin="250, 10, 220, 10">
 		</Canvas>
