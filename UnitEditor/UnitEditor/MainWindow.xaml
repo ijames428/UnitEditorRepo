@@ -10,39 +10,90 @@
 		<Canvas Name="UiCanvas">
 			<Button Name="NewButton" Height="25" Width="80" Click="New">New Bestiary</Button>
 			<Button Name="OpenButton" Height="25" Width="80" Click="Open" Canvas.Left="80">Open Bestiary</Button>
-			<Button Name="SaveButton" Height="25" Width="80" Click="Save" Canvas.Left="160" IsEnabled="False">Save Bestiary</Button>
+			<Button Name="SaveButton" Height="25" Width="80" Click="Save" Canvas.Left="160">Save Bestiary</Button>
 
 			<Label Name="BestiaryNameLabel" Canvas.Top="24">(No Bestiary open, currently)</Label>
 			<TextBox Name="BestiaryNameTextBox" Canvas.Top="25" Height="25" Width="150" KeyDown="OnKeyDownHandler" Visibility="Hidden"></TextBox>
 			<Button Name="ConfirmNameButton" Height="25" Width="50" Click="ConfirmNameButton_Click" Canvas.Left="150" Canvas.Top="25" Visibility="Hidden">Confirm</Button>
 			<Button Name="CancelNameButton" Height="25" Width="40" Click="CancelNameButton_Click" Canvas.Left="200" Canvas.Top="25" Visibility="Hidden">Cancel</Button>
-			<Button Name="CreateUnitButton" Height="25" Width="80" Click="CreateUnit" Canvas.Top="51" IsEnabled="False">Create Unit</Button>
+			<Button Name="CreateUnitButton" Height="25" Width="80" Click="CreateUnit" Canvas.Top="51">Create Unit</Button>
 
-			<ListBox Name="ListOfUnits" Canvas.Top="76" Height="300" Width="240" IsEnabled="False">
+			<ListBox Name="ListOfUnits" Canvas.Top="76" Height="143" Width="243">
 			</ListBox>
 
-			<ListBox Name="ListOfStates" Canvas.Top="10" Height="162" Width="104" IsEnabled="False" Canvas.Right="10">
+			<ListBox Name="ListOfStates" Canvas.Top="283" Height="117" Width="118" Canvas.Right="10" Canvas.Left="0">
 				<ListBoxItem Name="IdleState" Content="Idle" Selected="OnStateSelected"></ListBoxItem>
-				<ListBoxItem Name="WalkState" Content="Walk" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="WalkingState" Content="Walking" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="RunningState" Content="Running" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="DyingState" Content="Dying" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="DeadState" Content="Dead" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="AttackingState" Content="Attacking" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="BlockingState" Content="Blocking" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="HitStunState" Content="Hit Stun" Selected="OnStateSelected"></ListBoxItem>
 			</ListBox>
 
-			<Button Name="AddAnimationButton" Height="25" Width="90" Click="AddAnimationButton_Click" Canvas.Right="120" Canvas.Top="185">Add Animation</Button>
-			<ListBox Name="ListOfStateAnimations" Canvas.Top="215" Height="162" Width="200" IsEnabled="False" Canvas.Right="10"></ListBox>
-			<Label Name="numberOfFramesLabel" Canvas.Right="82" Canvas.Top="378">Number of Frames:</Label>
-			<TextBox Name="numberOfFramesTextBox" Canvas.Right="10" Canvas.Top="382" Width="75"></TextBox>
-			<Label Name="frameWidthLabel" Canvas.Right="82" Canvas.Top="396">Frame Width:</Label>
-			<TextBox Name="frameWidthTextBox" Canvas.Right="10" Canvas.Top="400" Width="75"></TextBox>
-			<Label Name="frameHeightLabel"  Canvas.Right="82" Canvas.Top="414">Frame Height:</Label>
-			<TextBox Name="frameHeightTextBox" Canvas.Right="10" Canvas.Top="418" Width="75"></TextBox>
-			<Label Name="framesPerRowLabel" Canvas.Right="82" Canvas.Top="432">Frames Per Row:</Label>
-			<TextBox Name="framesPerRowTextBox" Canvas.Right="10" Canvas.Top="436" Width="75"></TextBox>
-			<Label Name="framesPerColumnLabel"  Canvas.Right="82" Canvas.Top="450">Frame Per Col:</Label>
-			<TextBox Name="framesPerColumnTextBox" Canvas.Right="10" Canvas.Top="454" Width="75"></TextBox>
-			
-			<Label Name="framesPerSecondLabel" Canvas.Right="82" Canvas.Top="480">Frame Per Second:</Label>
-			<TextBox Name="framesPerSecondTextBox" Canvas.Right="50" Canvas.Top="484" Width="35"></TextBox>
+			<Button Name="AddAnimationButton" Height="25" Width="120" Click="AddAnimationButton_Click" Canvas.Right="120" Canvas.Top="573" Canvas.Left="0">Add Animation</Button>
+			<Button Name="DeleteAnimationButton" Height="25" Width="120" Click="DeleteAnimationButton_Click" Canvas.Right="120" Canvas.Top="573" Canvas.Left="125">Delete Animation</Button>
+			<ListBox Name="ListOfStateAnimations" Canvas.Top="405" Height="163" Width="243" Canvas.Right="10" Canvas.Left="0"></ListBox>
+			<Label Name="numberOfFramesLabel" Canvas.Right="82" Canvas.Top="38">Number of Frames:</Label>
+			<TextBox Name="numberOfFramesTextBox" Canvas.Right="10" Canvas.Top="42" Width="75"></TextBox>
+			<Label Name="frameWidthLabel" Canvas.Right="82" Canvas.Top="56">Frame Width:</Label>
+			<TextBox Name="frameWidthTextBox" Canvas.Right="10" Canvas.Top="60" Width="75"></TextBox>
+			<Label Name="frameHeightLabel"  Canvas.Right="82" Canvas.Top="74">Frame Height:</Label>
+			<TextBox Name="frameHeightTextBox" Canvas.Right="10" Canvas.Top="78" Width="75"></TextBox>
+			<Label Name="framesPerRowLabel" Canvas.Right="82" Canvas.Top="92">Frames Per Row:</Label>
+			<TextBox Name="framesPerRowTextBox" Canvas.Right="10" Canvas.Top="96" Width="75"></TextBox>
+			<Label Name="framesPerColumnLabel"  Canvas.Right="82" Canvas.Top="110">Frame Per Col:</Label>
+			<TextBox Name="framesPerColumnTextBox" Canvas.Right="10" Canvas.Top="114" Width="75"></TextBox>
+
+			<Label Name="framesPerSecondLabel" Canvas.Right="182" Canvas.Top="140">FPS:</Label>
+			<TextBox Name="framesPerSecondTextBox" Canvas.Right="150" Canvas.Top="144" Width="35"></TextBox>
+			<Label Name="CurrentFrameLabel" Canvas.Right="52" Canvas.Top="140">Current Frame:</Label>
+			<TextBox Name="CurrentFrameTextBox" Canvas.Right="20" Canvas.Top="144" Width="35"></TextBox>
+
+			<Label Name="UnitNameLabel" Canvas.Left="74" Canvas.Top="219">Name:</Label>
+			<TextBox Name="UnitNameTextBox" Canvas.Left="123" Canvas.Top="224" Width="120" KeyDown="OnKeyDownHandler"></TextBox>
+			<Label Name="HitPointsLabel" Canvas.Left="54" Canvas.Top="238">Hit Points:</Label>
+			<TextBox Name="HitPointsTextBox" Canvas.Left="123" Canvas.Top="242" Width="120"></TextBox>
+			<Label Name="MovementSpeedLabel" Canvas.Left="12" Canvas.Top="256">Movement Speed:</Label>
+			<TextBox Name="MovementSpeedTextBox" Canvas.Left="123" Canvas.Top="260" Width="120"></TextBox>
+			<!--Label Name="frameWidthLabel" Canvas.Right="82" Canvas.Top="396">Frame Width:</Label-->
+			<!--TextBox Name="frameWidthTextBox" Canvas.Right="10" Canvas.Top="400" Width="75"></TextBox-->
+			<!--Label Name="frameHeightLabel"  Canvas.Right="82" Canvas.Top="414">Frame Height:</Label-->
+			<!--TextBox Name="frameHeightTextBox" Canvas.Right="10" Canvas.Top="418" Width="75"></TextBox-->
+			<!--Label Name="framesPerRowLabel" Canvas.Right="82" Canvas.Top="432">Frames Per Row:</Label-->
+			<!--TextBox Name="framesPerRowTextBox" Canvas.Right="10" Canvas.Top="436" Width="75"></TextBox-->
+			<!--Label Name="framesPerColumnLabel"  Canvas.Right="82" Canvas.Top="450">Frame Per Col:</Label-->
+			<!--TextBox Name="framesPerColumnTextBox" Canvas.Right="10" Canvas.Top="454" Width="75"></TextBox-->
+
+			<Button Name="PreviousFrameButton" Height="25" Width="60" Click="PreviousFrameButton_Click" Canvas.Right="150" Canvas.Top="10">Prev</Button>
+			<Button Name="PlayPauseButton" Height="25" Width="80" Click="PlayPauseButton_Click" Canvas.Right="70" Canvas.Top="10">Play/Pause</Button>
+			<Button Name="NextFrameButton" Height="25" Width="60" Click="NextFrameButton_Click" Canvas.Right="10" Canvas.Top="10">Next</Button>
+
+			<Label Name="HurtAndHitBoxLabel" Canvas.Right="60" Canvas.Top="200">Hurt and Hit Boxes</Label>
+			<ListBox Name="ListOfHurtAndHitBoxes" Canvas.Top="219" Height="163" Width="210" Canvas.Right="10"></ListBox>
+
+			<Label Name="xLabel" Canvas.Right="80" Canvas.Top="383">X:</Label>
+			<TextBox Name="xTextBox" Canvas.Right="5" Canvas.Top="387" Width="75"></TextBox>
+			<Label Name="yLabel" Canvas.Right="80" Canvas.Top="401">Y:</Label>
+			<TextBox Name="yTextBox" Canvas.Right="5" Canvas.Top="405" Width="75"></TextBox>
+			<Label Name="wLabel" Canvas.Right="80" Canvas.Top="419">W:</Label>
+			<TextBox Name="wTextBox" Canvas.Right="5" Canvas.Top="423" Width="75"></TextBox>
+			<Label Name="hLabel"  Canvas.Right="80" Canvas.Top="437">H:</Label>
+			<TextBox Name="hTextBox" Canvas.Right="5" Canvas.Top="441" Width="75"></TextBox>
+			<Label Name="DamageLabel"  Canvas.Right="80" Canvas.Top="458">Damage:</Label>
+			<TextBox Name="DamageTextBox" Canvas.Right="5" Canvas.Top="462" Width="75"></TextBox>
+			<Label Name="KnockBackXLabel"  Canvas.Right="80" Canvas.Top="476">Knock Back X:</Label>
+			<TextBox Name="KnockBackXTextBox" Canvas.Right="5" Canvas.Top="480" Width="75"></TextBox>
+			<Label Name="KnockBackYLabel"  Canvas.Right="80" Canvas.Top="494">Knock Back Y:</Label>
+			<TextBox Name="KnockBackYTextBox" Canvas.Right="5" Canvas.Top="498" Width="75"></TextBox>
+
+			<CheckBox Name="HitBoxCheckBox" Checked="HitBoxCheckBox_Checked" Canvas.Right="30" Canvas.Top="180" IsChecked="False">Hit Box</CheckBox>
+			<CheckBox Name="HurtBoxCheckBox" Checked="HurtBoxCheckBox_Checked" Canvas.Right="125" Canvas.Top="180" IsChecked="True">Hurt Box</CheckBox>
+			<Button Name="DeleteHitOrHurtBoxButton" Height="25" Width="120" Click="DeleteHitOrHurtBoxButton_Click" Canvas.Right="5" Canvas.Top="520">Delete Hit/Hurt Box</Button>
 		</Canvas>
-		<Canvas Name="FrameCanvas" Background="Black" Margin="250, 10, 220, 10">
+		<Canvas Name="FrameCanvas" Background="Black" Margin="250, 10, 220, 10"
+				MouseUp="CanvasUp" MouseDown="CanvasDown" MouseMove="CanvasMove">
 		</Canvas>
 	</Grid>
 </Window>
