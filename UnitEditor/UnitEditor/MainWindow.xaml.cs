@@ -61,9 +61,67 @@ namespace UnitEditor
 				ListBoxItem item = (ListBoxItem)ListOfUnits.SelectedItem;
 				item.Content = UnitNameTextBox.Text;
 			}
+
+			if (numberOfFramesTextBox.IsFocused)
+			{
+				ListBoxItem selectedAnimationItem = (ListBoxItem)ListOfStateAnimations.SelectedItem;
+				if (selectedAnimationItem != null)
+				{
+					string selectedAnimationName = selectedAnimationItem.Content.ToString();
+					StateAnimation selectedAnimation = GetCurrentStateAnimation(selectedAnimationName);
+
+					if (selectedAnimation != null)
+					{
+						int numOfFrames = 0;
+
+						int.TryParse(numberOfFramesTextBox.Text, out numOfFrames);
+
+						selectedAnimation.NumberOfFrames = numOfFrames;
+					}
+				}
+			}
+
+			if (UnitNameTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					MyBestiary.DictOfUnits.Remove(SelectedUnit.UnitName);
+
+					SelectedUnit.UnitName = UnitNameTextBox.Text;
+
+					MyBestiary.DictOfUnits.Add(SelectedUnit.UnitName, SelectedUnit);
+				}
+			}
+
+			if (HitPointsTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					int result = 0;
+					int.TryParse(HitPointsTextBox.Text, out result);
+
+					SelectedUnit.HitPoints = result;
+				}
+			}
+
+			if (MovementSpeedTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					float result = 0.0f;
+					float.TryParse(MovementSpeedTextBox.Text, out result);
+
+					SelectedUnit.MovementSpeed = result;
+				}
+			}
 		}
 
 		private void Draw(object sender, EventArgs e)
+		{
+			DrawFrame();
+		}
+
+		private void DrawFrame()
 		{
 			if (animatedSprite != null)
 			{
@@ -78,14 +136,13 @@ namespace UnitEditor
 
 				if (AnimationState == ANIMATION_STATE_PLAY)
 				{
-					DrawFrame();
-
+					ChangeFrameInfo();
 					GoToNextFrame();
 				}
 			}
 		}
 
-		private void DrawFrame()
+		private void ChangeFrameInfo()
 		{
 			int i = 0;
 
@@ -103,34 +160,36 @@ namespace UnitEditor
 			FrameCanvas.Children.Add(spriteImage);
 
 			StateAnimation anim = GetCurrentStateAnimation();
-
-			ListOfHurtAndHitBoxes.Items.Clear();
-
-			if (anim.HitOrHurtBoxListItems.Any() && anim.HitOrHurtBoxListItems.Count > CurrentFrame && anim.HitOrHurtBoxListItems[CurrentFrame].Any())
+			if (anim != null)
 			{
-				for (i = 0; i < anim.HitOrHurtBoxListItems[CurrentFrame].Count; i++)
+				ListOfHurtAndHitBoxes.Items.Clear();
+
+				if (anim.HitOrHurtBoxListItems.Any() && anim.HitOrHurtBoxListItems.Count > CurrentFrame && anim.HitOrHurtBoxListItems[CurrentFrame].Any())
 				{
-					ListOfHurtAndHitBoxes.Items.Add(anim.HitOrHurtBoxListItems[CurrentFrame][i]);
+					for (i = 0; i < anim.HitOrHurtBoxListItems[CurrentFrame].Count; i++)
+					{
+						ListOfHurtAndHitBoxes.Items.Add(anim.HitOrHurtBoxListItems[CurrentFrame][i]);
+					}
 				}
-			}
 
-			if (anim.HitBoxPerFrame.Any() && anim.HitBoxPerFrame.Count > CurrentFrame && anim.HitBoxPerFrame[CurrentFrame].Any())
-			{
-				for (i = 0; i < anim.HitBoxPerFrame[CurrentFrame].Count; i++)
+				if (anim.HitBoxPerFrame.Any() && anim.HitBoxPerFrame.Count > CurrentFrame && anim.HitBoxPerFrame[CurrentFrame].Any())
 				{
-					Canvas.SetLeft(anim.HitBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HitBoxPerFrame[CurrentFrame][i].DrawRect.X);
-					Canvas.SetTop(anim.HitBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HitBoxPerFrame[CurrentFrame][i].DrawRect.Y);
-					FrameCanvas.Children.Add(anim.HitBoxPerFrame[CurrentFrame][i].DrawRectangle);
+					for (i = 0; i < anim.HitBoxPerFrame[CurrentFrame].Count; i++)
+					{
+						Canvas.SetLeft(anim.HitBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HitBoxPerFrame[CurrentFrame][i].DrawRect.X);
+						Canvas.SetTop(anim.HitBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HitBoxPerFrame[CurrentFrame][i].DrawRect.Y);
+						FrameCanvas.Children.Add(anim.HitBoxPerFrame[CurrentFrame][i].DrawRectangle);
+					}
 				}
-			}
 
-			if (anim.HurtBoxPerFrame.Any() && anim.HurtBoxPerFrame.Count > CurrentFrame && anim.HurtBoxPerFrame[CurrentFrame].Any())
-			{
-				for (i = 0; i < anim.HurtBoxPerFrame[CurrentFrame].Count; i++)
+				if (anim.HurtBoxPerFrame.Any() && anim.HurtBoxPerFrame.Count > CurrentFrame && anim.HurtBoxPerFrame[CurrentFrame].Any())
 				{
-					Canvas.SetLeft(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HurtBoxPerFrame[CurrentFrame][i].DrawRect.X);
-					Canvas.SetTop(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HurtBoxPerFrame[CurrentFrame][i].DrawRect.Y);
-					FrameCanvas.Children.Add(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle);
+					for (i = 0; i < anim.HurtBoxPerFrame[CurrentFrame].Count; i++)
+					{
+						Canvas.SetLeft(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HurtBoxPerFrame[CurrentFrame][i].DrawRect.X);
+						Canvas.SetTop(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HurtBoxPerFrame[CurrentFrame][i].DrawRect.Y);
+						FrameCanvas.Children.Add(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle);
+					}
 				}
 			}
 		}
@@ -267,44 +326,38 @@ namespace UnitEditor
 		{
 			ListBoxItem item = (ListBoxItem)sender;
 			UnitState = item.Content.ToString();
-
-			List<StateAnimation> unitsStateAnimationList = new List<StateAnimation>();
-
-			if (UnitState == "Idle")
-			{
-				unitsStateAnimationList = SelectedUnit.IdleAnimations;
-			}
-			else if (UnitState == "Walking")
-			{
-				unitsStateAnimationList = SelectedUnit.WalkingAnimations;
-			}
-
-			ListOfStateAnimations.Items.Clear();
 			FrameCanvas.Children.Clear();
 
-			for (int i = 0; i < unitsStateAnimationList.Count; i++)
+			List<StateAnimation> unitsStateAnimationList = GetCurrentStatesAnimations();
+
+			if (unitsStateAnimationList != null)
 			{
-				ListBoxItem stateAnimationItem = new ListBoxItem();
-				stateAnimationItem.Content = unitsStateAnimationList[i].FilePath;
-				stateAnimationItem.Selected += OnAnimationSelected;
-				stateAnimationItem.Unselected += OnAnimationUnselected;
+				ListOfStateAnimations.Items.Clear();
 
-				ListOfStateAnimations.Items.Add(stateAnimationItem);
-			}
+				for (int i = 0; i < unitsStateAnimationList.Count; i++)
+				{
+					ListBoxItem stateAnimationItem = new ListBoxItem();
+					stateAnimationItem.Content = unitsStateAnimationList[i].FilePath;
+					stateAnimationItem.Selected += OnAnimationSelected;
+					stateAnimationItem.Unselected += OnAnimationUnselected;
 
-			SavePreviouslySelectedAnimationsInformation(previouslySelectedAnimationsName);
-			SavePreviouslySelectedHitOrHurtBoxValues();
+					ListOfStateAnimations.Items.Add(stateAnimationItem);
+				}
 
-			if (ListOfStateAnimations.Items.Count > 0)
-			{
-				ListBoxItem stateAnimationItem = (ListBoxItem)ListOfStateAnimations.Items[0];
-				stateAnimationItem.IsSelected = true;
+				SavePreviouslySelectedAnimationsInformation(previouslySelectedAnimationsName);
+				SavePreviouslySelectedHitOrHurtBoxValues();
 
-				numberOfFramesTextBox.Text = unitsStateAnimationList[0].NumberOfFrames.ToString();
-				frameWidthTextBox.Text = unitsStateAnimationList[0].FrameDimensionsX.ToString();
-				frameHeightTextBox.Text = unitsStateAnimationList[0].FrameDimensionsY.ToString();
-				framesPerRowTextBox.Text = unitsStateAnimationList[0].FramesPerRow.ToString();
-				framesPerColumnTextBox.Text = unitsStateAnimationList[0].FramesPerColumn.ToString();
+				if (ListOfStateAnimations.Items.Count > 0)
+				{
+					ListBoxItem stateAnimationItem = (ListBoxItem)ListOfStateAnimations.Items[0];
+					stateAnimationItem.IsSelected = true;
+
+					numberOfFramesTextBox.Text = unitsStateAnimationList[0].NumberOfFrames.ToString();
+					frameWidthTextBox.Text = unitsStateAnimationList[0].FrameDimensionsX.ToString();
+					frameHeightTextBox.Text = unitsStateAnimationList[0].FrameDimensionsY.ToString();
+					framesPerRowTextBox.Text = unitsStateAnimationList[0].FramesPerRow.ToString();
+					framesPerColumnTextBox.Text = unitsStateAnimationList[0].FramesPerColumn.ToString();
+				}
 			}
 
 			//DeselectUnit();
@@ -318,23 +371,20 @@ namespace UnitEditor
 		private StateAnimation GetCurrentStateAnimation()
 		{
 			ListBoxItem item = (ListBoxItem)ListOfStateAnimations.SelectedItem;
-			string name = item.Content.ToString();
 
-			return GetCurrentStateAnimation(name);
+			if (item != null)
+			{
+				string name = item.Content.ToString();
+
+				return GetCurrentStateAnimation(name);
+			}
+
+			return null;
 		}
 
 		private StateAnimation GetCurrentStateAnimation(string name)
 		{
-			List<StateAnimation> unitsStateAnimationList = new List<StateAnimation>();
-
-			if (UnitState == "Idle")
-			{
-				unitsStateAnimationList = SelectedUnit.IdleAnimations;
-			}
-			else if (UnitState == "Walking")
-			{
-				unitsStateAnimationList = SelectedUnit.WalkingAnimations;
-			}
+			List<StateAnimation> unitsStateAnimationList = GetCurrentStatesAnimations();
 
 			for (int i = 0; i < unitsStateAnimationList.Count; i++)
 			{
@@ -342,6 +392,67 @@ namespace UnitEditor
 				{
 					return unitsStateAnimationList[i];
 				}
+			}
+
+			return null;
+		}
+
+		private List<StateAnimation> GetCurrentStatesAnimations()
+		{
+			if (SelectedUnit != null)
+			{
+				List<StateAnimation> unitsStateAnimationList = new List<StateAnimation>();
+
+				if (UnitState == "Idle")
+				{
+					unitsStateAnimationList = SelectedUnit.IdleAnimations;
+				}
+				else if (UnitState == "Walking")
+				{
+					unitsStateAnimationList = SelectedUnit.WalkingAnimations;
+				}
+				else if (UnitState == "Running")
+				{
+					unitsStateAnimationList = SelectedUnit.RunningAnimations;
+				}
+				else if (UnitState == "Dying")
+				{
+					unitsStateAnimationList = SelectedUnit.DyingAnimations;
+				}
+				else if (UnitState == "Dead")
+				{
+					unitsStateAnimationList = SelectedUnit.DeadAnimations;
+				}
+				else if (UnitState == "Attacking")
+				{
+					unitsStateAnimationList = SelectedUnit.AttackingAnimations;
+				}
+				else if (UnitState == "Blocking")
+				{
+					unitsStateAnimationList = SelectedUnit.BlockingAnimations;
+				}
+				else if (UnitState == "Hit Stun")
+				{
+					unitsStateAnimationList = SelectedUnit.HitStunAnimations;
+				}
+				else if (UnitState == "Jumping")
+				{
+					unitsStateAnimationList = SelectedUnit.DeadAnimations;
+				}
+				else if (UnitState == "Jump Apex")
+				{
+					unitsStateAnimationList = SelectedUnit.AttackingAnimations;
+				}
+				else if (UnitState == "Falling")
+				{
+					unitsStateAnimationList = SelectedUnit.BlockingAnimations;
+				}
+				else if (UnitState == "Landing")
+				{
+					unitsStateAnimationList = SelectedUnit.HitStunAnimations;
+				}
+
+				return unitsStateAnimationList;
 			}
 
 			return null;
@@ -566,66 +677,69 @@ namespace UnitEditor
 				newHitOrHurtBox.Damage = 0;
 				newHitOrHurtBox.KnockBackX = 0.0f;
 				newHitOrHurtBox.KnockBackY = 0.0f;
+				newHitOrHurtBox.Frame = CurrentFrame;
 
-				if (HitBoxCheckBox.IsChecked.HasValue && HitBoxCheckBox.IsChecked.Value)
-				{
-					while (anim.HitBoxPerFrame.Count <= CurrentFrame)
-					{
-						anim.HitBoxPerFrame.Add(new List<HitOrHurtBox>());
-					}
+				AddNewHitOrHurtBox(anim, newHitOrHurtBox, CurrentFrame, HitBoxCheckBox.IsChecked.HasValue && HitBoxCheckBox.IsChecked.Value, true);
 
-					if (anim.HitBoxPerFrame.Count > CurrentFrame)
-					{
-						if (anim.HitBoxPerFrame[CurrentFrame] == null)
-						{
-							anim.HitBoxPerFrame[CurrentFrame] = new List<HitOrHurtBox>();
-						}
-
-						newHitOrHurtBox.Name = "Hit " + anim.HitBoxPerFrame[CurrentFrame].Where(x => x.Name.Contains("Hit")).ToList().Count.ToString();
-						anim.HitBoxPerFrame[CurrentFrame].Add(newHitOrHurtBox);
-					}
-				}
-				else
-				{
-					while (anim.HurtBoxPerFrame.Count <= CurrentFrame)
-					{
-						anim.HurtBoxPerFrame.Add(new List<HitOrHurtBox>());
-					}
-
-					if (anim.HurtBoxPerFrame.Count > CurrentFrame)
-					{
-						if (anim.HurtBoxPerFrame[CurrentFrame] == null)
-						{
-							anim.HurtBoxPerFrame[CurrentFrame] = new List<HitOrHurtBox>();
-						}
-
-						newHitOrHurtBox.Name = "Hurt " + anim.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
-						anim.HurtBoxPerFrame[CurrentFrame].Add(newHitOrHurtBox);
-					}
-				}
-
-				ListBoxItem newListBoxItem = new ListBoxItem();
-				newListBoxItem.Content = newHitOrHurtBox.Name;
-				newListBoxItem.Selected += OnHitOrHurtBoxSelected;
-				newListBoxItem.Unselected += OnHitOrHurtBoxUnselected;
-				ListOfHurtAndHitBoxes.Items.Add(newListBoxItem);
-
-				//anim.HitOrHurtBoxListItems.Add(newListBoxItem);
-				while (anim.HitOrHurtBoxListItems.Count <= CurrentFrame)
-				{
-					anim.HitOrHurtBoxListItems.Add(new List<ListBoxItem>());
-				}
-
-				if (anim.HitOrHurtBoxListItems.Count > CurrentFrame)
-				{
-					if (anim.HitOrHurtBoxListItems[CurrentFrame] == null)
-					{
-						anim.HitOrHurtBoxListItems[CurrentFrame] = new List<ListBoxItem>();
-					}
-
-					//newHitOrHurtBox.Name = "Hurt " + anim.HitOrHurtBoxListItems[CurrentFrame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
-					anim.HitOrHurtBoxListItems[CurrentFrame].Add(newListBoxItem);
-				}
+				//if (HitBoxCheckBox.IsChecked.HasValue && HitBoxCheckBox.IsChecked.Value)
+				//{
+				//	while (anim.HitBoxPerFrame.Count <= CurrentFrame)
+				//	{
+				//		anim.HitBoxPerFrame.Add(new List<HitOrHurtBox>());
+				//	}
+				//
+				//	if (anim.HitBoxPerFrame.Count > CurrentFrame)
+				//	{
+				//		if (anim.HitBoxPerFrame[CurrentFrame] == null)
+				//		{
+				//			anim.HitBoxPerFrame[CurrentFrame] = new List<HitOrHurtBox>();
+				//		}
+				//
+				//		newHitOrHurtBox.Name = "Hit " + anim.HitBoxPerFrame[CurrentFrame].Where(x => x.Name.Contains("Hit")).ToList().Count.ToString();
+				//		anim.HitBoxPerFrame[CurrentFrame].Add(newHitOrHurtBox);
+				//	}
+				//}
+				//else
+				//{
+				//	while (anim.HurtBoxPerFrame.Count <= CurrentFrame)
+				//	{
+				//		anim.HurtBoxPerFrame.Add(new List<HitOrHurtBox>());
+				//	}
+				//
+				//	if (anim.HurtBoxPerFrame.Count > CurrentFrame)
+				//	{
+				//		if (anim.HurtBoxPerFrame[CurrentFrame] == null)
+				//		{
+				//			anim.HurtBoxPerFrame[CurrentFrame] = new List<HitOrHurtBox>();
+				//		}
+				//
+				//		newHitOrHurtBox.Name = "Hurt " + anim.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
+				//		anim.HurtBoxPerFrame[CurrentFrame].Add(newHitOrHurtBox);
+				//	}
+				//}
+				//
+				//ListBoxItem newListBoxItem = new ListBoxItem();
+				//newListBoxItem.Content = newHitOrHurtBox.Name;
+				//newListBoxItem.Selected += OnHitOrHurtBoxSelected;
+				//newListBoxItem.Unselected += OnHitOrHurtBoxUnselected;
+				//ListOfHurtAndHitBoxes.Items.Add(newListBoxItem);
+				//
+				////anim.HitOrHurtBoxListItems.Add(newListBoxItem);
+				//while (anim.HitOrHurtBoxListItems.Count <= CurrentFrame)
+				//{
+				//	anim.HitOrHurtBoxListItems.Add(new List<ListBoxItem>());
+				//}
+				//
+				//if (anim.HitOrHurtBoxListItems.Count > CurrentFrame)
+				//{
+				//	if (anim.HitOrHurtBoxListItems[CurrentFrame] == null)
+				//	{
+				//		anim.HitOrHurtBoxListItems[CurrentFrame] = new List<ListBoxItem>();
+				//	}
+				//
+				//	//newHitOrHurtBox.Name = "Hurt " + anim.HitOrHurtBoxListItems[CurrentFrame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
+				//	anim.HitOrHurtBoxListItems[CurrentFrame].Add(newListBoxItem);
+				//}
 
 				xTextBox.Text = newHitOrHurtBox.Box.X.ToString();
 				yTextBox.Text = newHitOrHurtBox.Box.Y.ToString();
@@ -648,6 +762,73 @@ namespace UnitEditor
 				//Select(name);
 
 				rect_getting_drawn = null;
+			}
+		}
+
+		private void AddNewHitOrHurtBox(StateAnimation anim, HitOrHurtBox newHitOrHurtBox, int frame, bool makingHitBox, bool addHitBoxToCurrentListBox)
+		{
+			if (makingHitBox)
+			{
+				while (anim.HitBoxPerFrame.Count <= frame)
+				{
+					anim.HitBoxPerFrame.Add(new List<HitOrHurtBox>());
+				}
+
+				if (anim.HitBoxPerFrame.Count > frame)
+				{
+					if (anim.HitBoxPerFrame[frame] == null)
+					{
+						anim.HitBoxPerFrame[frame] = new List<HitOrHurtBox>();
+					}
+
+					newHitOrHurtBox.Name = "Hit " + anim.HitBoxPerFrame[frame].Where(x => x.Name.Contains("Hit")).ToList().Count.ToString();
+					anim.HitBoxPerFrame[frame].Add(newHitOrHurtBox);
+				}
+			}
+			else
+			{
+				while (anim.HurtBoxPerFrame.Count <= frame)
+				{
+					anim.HurtBoxPerFrame.Add(new List<HitOrHurtBox>());
+				}
+
+				if (anim.HurtBoxPerFrame.Count > frame)
+				{
+					if (anim.HurtBoxPerFrame[frame] == null)
+					{
+						anim.HurtBoxPerFrame[frame] = new List<HitOrHurtBox>();
+					}
+
+					newHitOrHurtBox.Name = "Hurt " + anim.HurtBoxPerFrame[frame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
+					anim.HurtBoxPerFrame[frame].Add(newHitOrHurtBox);
+				}
+			}
+
+			ListBoxItem newListBoxItem = new ListBoxItem();
+			newListBoxItem.Content = newHitOrHurtBox.Name;
+			newListBoxItem.Selected += OnHitOrHurtBoxSelected;
+			newListBoxItem.Unselected += OnHitOrHurtBoxUnselected;
+
+			if (addHitBoxToCurrentListBox)
+			{
+				ListOfHurtAndHitBoxes.Items.Add(newListBoxItem);
+			}
+
+			//anim.HitOrHurtBoxListItems.Add(newListBoxItem);
+			while (anim.HitOrHurtBoxListItems.Count <= frame)
+			{
+				anim.HitOrHurtBoxListItems.Add(new List<ListBoxItem>());
+			}
+
+			if (anim.HitOrHurtBoxListItems.Count > frame)
+			{
+				if (anim.HitOrHurtBoxListItems[frame] == null)
+				{
+					anim.HitOrHurtBoxListItems[frame] = new List<ListBoxItem>();
+				}
+
+				//newHitOrHurtBox.Name = "Hurt " + anim.HitOrHurtBoxListItems[frame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
+				anim.HitOrHurtBoxListItems[frame].Add(newListBoxItem);
 			}
 		}
 
@@ -815,6 +996,16 @@ namespace UnitEditor
 
 					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.IdleAnimations);
 					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.WalkingAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.RunningAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.DyingAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.DeadAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.AttackingAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.BlockingAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.HitStunAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.JumpingAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.JumpApexAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.FallingAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.LandingAnimations);
 				}
 
 				FrameCanvas.Children.Clear();
@@ -1087,8 +1278,15 @@ namespace UnitEditor
 		private void PreviousFrameButton_Click(object sender, RoutedEventArgs e)
 		{
 			GoToPreviousFrame();
-
 			DrawFrame();
+			ChangeFrameInfo();
+		}
+
+		private void NextFrameButton_Click(object sender, RoutedEventArgs e)
+		{
+			GoToNextFrame();
+			DrawFrame();
+			ChangeFrameInfo();
 		}
 
 		private void PlayPauseButton_Click(object sender, RoutedEventArgs e)
@@ -1101,13 +1299,6 @@ namespace UnitEditor
 			{
 				AnimationState = ANIMATION_STATE_PLAY;
 			}
-		}
-
-		private void NextFrameButton_Click(object sender, RoutedEventArgs e)
-		{
-			GoToNextFrame();
-
-			DrawFrame();
 		}
 
 		private void AddAnimationButton_Click(object sender, RoutedEventArgs e)
@@ -1147,16 +1338,8 @@ namespace UnitEditor
 
 		private void AddStateAnimationToSelectedUnitsState(StateAnimation stateAnimation)
 		{
-			//ListBoxItem item = (ListBoxItem)ListOfStates.SelectedItem;
-
-			if (UnitState == "Idle")
-			{
-				SelectedUnit.IdleAnimations.Add(stateAnimation);
-			}
-			else if (UnitState == "Walking")
-			{
-				SelectedUnit.WalkingAnimations.Add(stateAnimation);
-			}
+			List<StateAnimation> unitsStateAnimationList = GetCurrentStatesAnimations();
+			unitsStateAnimationList.Add(stateAnimation);
 		}
 
 		private void HitBoxCheckBox_Checked(object sender, RoutedEventArgs e)
@@ -1186,16 +1369,7 @@ namespace UnitEditor
 					case MessageBoxResult.Yes:
 						ListBoxItem selectedAnimationItem = (ListBoxItem)ListOfStateAnimations.SelectedItem;
 						string selectedAnimationName = selectedAnimationItem.Content.ToString();
-						List<StateAnimation> unitsStateAnimationList = new List<StateAnimation>();
-
-						if (UnitState == "Idle")
-						{
-							unitsStateAnimationList = SelectedUnit.IdleAnimations;
-						}
-						else if (UnitState == "Walking")
-						{
-							unitsStateAnimationList = SelectedUnit.WalkingAnimations;
-						}
+						List<StateAnimation> unitsStateAnimationList = GetCurrentStatesAnimations();
 
 						for (int i = 0; i < unitsStateAnimationList.Count; i++)
 						{
@@ -1273,7 +1447,7 @@ namespace UnitEditor
 									if (selectedHitOrHurtBoxName == selectedAnimation.HurtBoxPerFrame[i][box].Name)
 									{
 										FrameCanvas.Children.Remove(selectedAnimation.HurtBoxPerFrame[i][box].DrawRectangle);
-										selectedAnimation.HurtBoxPerFrame[i].RemoveAt(i);
+										selectedAnimation.HurtBoxPerFrame[i].RemoveAt(box);
 										breakOutOfForLoops = true;
 										break;
 									}
@@ -1315,6 +1489,94 @@ namespace UnitEditor
 				}
 			}
 		}
+
+		private void CopyBoxToNextFrameButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (ListOfHurtAndHitBoxes.SelectedItem != null)
+			{
+				ListBoxItem selectedAnimationItem = (ListBoxItem)ListOfStateAnimations.SelectedItem;
+				string selectedAnimationName = selectedAnimationItem.Content.ToString();
+				StateAnimation selectedAnimation = GetCurrentStateAnimation(selectedAnimationName);
+
+				if (CurrentFrame + 1 < selectedAnimation.NumberOfFrames)
+				{
+					ListBoxItem selectedHitOrHurtBoxItem = (ListBoxItem)ListOfHurtAndHitBoxes.SelectedItem;
+					string selectedHitOrHurtBoxName = selectedHitOrHurtBoxItem.Content.ToString();
+					HitOrHurtBox origHitOrHurtBox;
+					bool isHitBox = selectedHitOrHurtBoxName.Contains("Hit");
+
+					if (isHitBox)
+					{
+						origHitOrHurtBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+					}
+					else
+					{
+						origHitOrHurtBox = selectedAnimation.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+					}
+
+					if (origHitOrHurtBox != null)
+					{
+						HitOrHurtBox newHitOrHurtBox = new HitOrHurtBox();
+						newHitOrHurtBox.Box.X = origHitOrHurtBox.Box.X;
+						newHitOrHurtBox.Box.Y = origHitOrHurtBox.Box.Y;
+						newHitOrHurtBox.Box.Width = origHitOrHurtBox.Box.Width;
+						newHitOrHurtBox.Box.Height = origHitOrHurtBox.Box.Height;
+						newHitOrHurtBox.DrawRect.X = origHitOrHurtBox.DrawRect.X;
+						newHitOrHurtBox.DrawRect.Y = origHitOrHurtBox.DrawRect.Y;
+						newHitOrHurtBox.DrawRect.Width = origHitOrHurtBox.DrawRect.Width;
+						newHitOrHurtBox.DrawRect.Height = origHitOrHurtBox.DrawRect.Height;
+						newHitOrHurtBox.DrawRectangle = origHitOrHurtBox.DrawRectangle;
+						newHitOrHurtBox.Damage = origHitOrHurtBox.Damage;
+						newHitOrHurtBox.KnockBackX = origHitOrHurtBox.KnockBackX;
+						newHitOrHurtBox.KnockBackY = origHitOrHurtBox.KnockBackY;
+						newHitOrHurtBox.Frame = CurrentFrame + 1;
+
+						AddNewHitOrHurtBox(selectedAnimation, newHitOrHurtBox, CurrentFrame + 1, isHitBox, false);
+					}
+				}
+			}
+		}
+
+		private void SelectivelyHandleMouseButton(object sender, MouseButtonEventArgs e)
+		{
+			var textbox = (sender as TextBox);
+			if (textbox != null && !textbox.IsKeyboardFocusWithin)
+			{
+				if (e.OriginalSource.GetType().Name == "TextBoxView")
+				{
+					e.Handled = true;
+					textbox.Focus();
+				}
+			}
+		}
+
+		private void SelectAllText(object sender, RoutedEventArgs e)
+		{
+			var textBox = e.OriginalSource as TextBox;
+			if (textBox != null)
+				textBox.SelectAll();
+		}
+
+		private void Window_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Right)
+			{
+				StateAnimation anim = GetCurrentStateAnimation();
+				if (anim != null)
+				{
+					NextFrameButton_Click(null, null);
+				}
+			}
+
+			if (e.Key == Key.Left)
+			{
+				StateAnimation anim = GetCurrentStateAnimation();
+				if (anim != null)
+				{
+					PreviousFrameButton_Click(null, null);
+				}
+			}
+		}
 	}
 
 	public class Bestiary
@@ -1335,6 +1597,16 @@ namespace UnitEditor
 		public float MovementSpeed = 0.0f;
 		public List<StateAnimation> IdleAnimations = new List<StateAnimation>();
 		public List<StateAnimation> WalkingAnimations = new List<StateAnimation>();
+		public List<StateAnimation> RunningAnimations = new List<StateAnimation>();
+		public List<StateAnimation> DyingAnimations = new List<StateAnimation>();
+		public List<StateAnimation> DeadAnimations = new List<StateAnimation>();
+		public List<StateAnimation> AttackingAnimations = new List<StateAnimation>();
+		public List<StateAnimation> BlockingAnimations = new List<StateAnimation>();
+		public List<StateAnimation> HitStunAnimations = new List<StateAnimation>();
+		public List<StateAnimation> JumpingAnimations = new List<StateAnimation>();
+		public List<StateAnimation> JumpApexAnimations = new List<StateAnimation>();
+		public List<StateAnimation> FallingAnimations = new List<StateAnimation>();
+		public List<StateAnimation> LandingAnimations = new List<StateAnimation>();
 
 		public Unit()
 		{
@@ -1367,6 +1639,7 @@ namespace UnitEditor
 		public string Name = "";
 		public Rect Box = new Rect();
 		public Rect DrawRect = new Rect();
+		public int Frame = 0;
 		[JsonIgnore]
 		private Rectangle _drawRectangle;
 		[JsonIgnore]

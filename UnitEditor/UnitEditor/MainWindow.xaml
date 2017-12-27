@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnitEditor"
         mc:Ignorable="d" Closing="DataWindow_Closing"
-        Title="MainWindow" d:DesignWidth="1313.902" d:DesignHeight="773.948">
+        Title="MainWindow" d:DesignWidth="1313.902" d:DesignHeight="773.948" KeyDown="Window_KeyDown">
 	<Grid>
 		<Canvas Name="UiCanvas">
 			<Button Name="NewButton" Height="25" Width="80" Click="New">New Bestiary</Button>
@@ -30,33 +30,37 @@
 				<ListBoxItem Name="AttackingState" Content="Attacking" Selected="OnStateSelected"></ListBoxItem>
 				<ListBoxItem Name="BlockingState" Content="Blocking" Selected="OnStateSelected"></ListBoxItem>
 				<ListBoxItem Name="HitStunState" Content="Hit Stun" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="JumpingState" Content="Jumping" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="JumpApexState" Content="Jump Apex" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="FallingState" Content="Falling" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="LandingState" Content="Landing" Selected="OnStateSelected"></ListBoxItem>
 			</ListBox>
 
 			<Button Name="AddAnimationButton" Height="25" Width="120" Click="AddAnimationButton_Click" Canvas.Right="120" Canvas.Top="573" Canvas.Left="0">Add Animation</Button>
 			<Button Name="DeleteAnimationButton" Height="25" Width="120" Click="DeleteAnimationButton_Click" Canvas.Right="120" Canvas.Top="573" Canvas.Left="125">Delete Animation</Button>
 			<ListBox Name="ListOfStateAnimations" Canvas.Top="405" Height="163" Width="243" Canvas.Right="10" Canvas.Left="0"></ListBox>
 			<Label Name="numberOfFramesLabel" Canvas.Right="82" Canvas.Top="38">Number of Frames:</Label>
-			<TextBox Name="numberOfFramesTextBox" Canvas.Right="10" Canvas.Top="42" Width="75"></TextBox>
+			<TextBox Name="numberOfFramesTextBox" Canvas.Right="10" Canvas.Top="42" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="frameWidthLabel" Canvas.Right="82" Canvas.Top="56">Frame Width:</Label>
-			<TextBox Name="frameWidthTextBox" Canvas.Right="10" Canvas.Top="60" Width="75"></TextBox>
+			<TextBox Name="frameWidthTextBox" Canvas.Right="10" Canvas.Top="60" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="frameHeightLabel"  Canvas.Right="82" Canvas.Top="74">Frame Height:</Label>
-			<TextBox Name="frameHeightTextBox" Canvas.Right="10" Canvas.Top="78" Width="75"></TextBox>
+			<TextBox Name="frameHeightTextBox" Canvas.Right="10" Canvas.Top="78" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="framesPerRowLabel" Canvas.Right="82" Canvas.Top="92">Frames Per Row:</Label>
-			<TextBox Name="framesPerRowTextBox" Canvas.Right="10" Canvas.Top="96" Width="75"></TextBox>
+			<TextBox Name="framesPerRowTextBox" Canvas.Right="10" Canvas.Top="96" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="framesPerColumnLabel"  Canvas.Right="82" Canvas.Top="110">Frame Per Col:</Label>
-			<TextBox Name="framesPerColumnTextBox" Canvas.Right="10" Canvas.Top="114" Width="75"></TextBox>
+			<TextBox Name="framesPerColumnTextBox" Canvas.Right="10" Canvas.Top="114" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 
 			<Label Name="framesPerSecondLabel" Canvas.Right="182" Canvas.Top="140">FPS:</Label>
-			<TextBox Name="framesPerSecondTextBox" Canvas.Right="150" Canvas.Top="144" Width="35"></TextBox>
+			<TextBox Name="framesPerSecondTextBox" Canvas.Right="150" Canvas.Top="144" Width="35" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="CurrentFrameLabel" Canvas.Right="52" Canvas.Top="140">Current Frame:</Label>
-			<TextBox Name="CurrentFrameTextBox" Canvas.Right="20" Canvas.Top="144" Width="35"></TextBox>
+			<TextBox Name="CurrentFrameTextBox" Canvas.Right="20" Canvas.Top="144" Width="35" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 
 			<Label Name="UnitNameLabel" Canvas.Left="74" Canvas.Top="219">Name:</Label>
-			<TextBox Name="UnitNameTextBox" Canvas.Left="123" Canvas.Top="224" Width="120" KeyDown="OnKeyDownHandler"></TextBox>
+			<TextBox Name="UnitNameTextBox" Canvas.Left="123" Canvas.Top="224" Width="120" KeyDown="OnKeyDownHandler" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="HitPointsLabel" Canvas.Left="54" Canvas.Top="238">Hit Points:</Label>
-			<TextBox Name="HitPointsTextBox" Canvas.Left="123" Canvas.Top="242" Width="120"></TextBox>
+			<TextBox Name="HitPointsTextBox" Canvas.Left="123" Canvas.Top="242" Width="120" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="MovementSpeedLabel" Canvas.Left="12" Canvas.Top="256">Movement Speed:</Label>
-			<TextBox Name="MovementSpeedTextBox" Canvas.Left="123" Canvas.Top="260" Width="120"></TextBox>
+			<TextBox Name="MovementSpeedTextBox" Canvas.Left="123" Canvas.Top="260" Width="120" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<!--Label Name="frameWidthLabel" Canvas.Right="82" Canvas.Top="396">Frame Width:</Label-->
 			<!--TextBox Name="frameWidthTextBox" Canvas.Right="10" Canvas.Top="400" Width="75"></TextBox-->
 			<!--Label Name="frameHeightLabel"  Canvas.Right="82" Canvas.Top="414">Frame Height:</Label-->
@@ -74,23 +78,24 @@
 			<ListBox Name="ListOfHurtAndHitBoxes" Canvas.Top="219" Height="163" Width="210" Canvas.Right="10"></ListBox>
 
 			<Label Name="xLabel" Canvas.Right="80" Canvas.Top="383">X:</Label>
-			<TextBox Name="xTextBox" Canvas.Right="5" Canvas.Top="387" Width="75"></TextBox>
+			<TextBox Name="xTextBox" Canvas.Right="5" Canvas.Top="387" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="yLabel" Canvas.Right="80" Canvas.Top="401">Y:</Label>
-			<TextBox Name="yTextBox" Canvas.Right="5" Canvas.Top="405" Width="75"></TextBox>
+			<TextBox Name="yTextBox" Canvas.Right="5" Canvas.Top="405" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="wLabel" Canvas.Right="80" Canvas.Top="419">W:</Label>
-			<TextBox Name="wTextBox" Canvas.Right="5" Canvas.Top="423" Width="75"></TextBox>
+			<TextBox Name="wTextBox" Canvas.Right="5" Canvas.Top="423" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="hLabel"  Canvas.Right="80" Canvas.Top="437">H:</Label>
-			<TextBox Name="hTextBox" Canvas.Right="5" Canvas.Top="441" Width="75"></TextBox>
+			<TextBox Name="hTextBox" Canvas.Right="5" Canvas.Top="441" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="DamageLabel"  Canvas.Right="80" Canvas.Top="458">Damage:</Label>
-			<TextBox Name="DamageTextBox" Canvas.Right="5" Canvas.Top="462" Width="75"></TextBox>
+			<TextBox Name="DamageTextBox" Canvas.Right="5" Canvas.Top="462" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="KnockBackXLabel"  Canvas.Right="80" Canvas.Top="476">Knock Back X:</Label>
-			<TextBox Name="KnockBackXTextBox" Canvas.Right="5" Canvas.Top="480" Width="75"></TextBox>
+			<TextBox Name="KnockBackXTextBox" Canvas.Right="5" Canvas.Top="480" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="KnockBackYLabel"  Canvas.Right="80" Canvas.Top="494">Knock Back Y:</Label>
-			<TextBox Name="KnockBackYTextBox" Canvas.Right="5" Canvas.Top="498" Width="75"></TextBox>
+			<TextBox Name="KnockBackYTextBox" Canvas.Right="5" Canvas.Top="498" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 
 			<CheckBox Name="HitBoxCheckBox" Checked="HitBoxCheckBox_Checked" Canvas.Right="30" Canvas.Top="180" IsChecked="False">Hit Box</CheckBox>
 			<CheckBox Name="HurtBoxCheckBox" Checked="HurtBoxCheckBox_Checked" Canvas.Right="125" Canvas.Top="180" IsChecked="True">Hurt Box</CheckBox>
 			<Button Name="DeleteHitOrHurtBoxButton" Height="25" Width="120" Click="DeleteHitOrHurtBoxButton_Click" Canvas.Right="5" Canvas.Top="520">Delete Hit/Hurt Box</Button>
+			<Button Name="CopyBoxToNextFrameButton" Height="25" Width="150" Click="CopyBoxToNextFrameButton_Click" Canvas.Right="5" Canvas.Top="550">Copy Box To Next Frame</Button>
 		</Canvas>
 		<Canvas Name="FrameCanvas" Background="Black" Margin="250, 10, 220, 10"
 				MouseUp="CanvasUp" MouseDown="CanvasDown" MouseMove="CanvasMove">
