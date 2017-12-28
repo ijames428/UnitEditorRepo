@@ -437,19 +437,19 @@ namespace UnitEditor
 				}
 				else if (UnitState == "Jumping")
 				{
-					unitsStateAnimationList = SelectedUnit.DeadAnimations;
+					unitsStateAnimationList = SelectedUnit.JumpingAnimations;
 				}
 				else if (UnitState == "Jump Apex")
 				{
-					unitsStateAnimationList = SelectedUnit.AttackingAnimations;
+					unitsStateAnimationList = SelectedUnit.JumpApexAnimations;
 				}
 				else if (UnitState == "Falling")
 				{
-					unitsStateAnimationList = SelectedUnit.BlockingAnimations;
+					unitsStateAnimationList = SelectedUnit.FallingAnimations;
 				}
 				else if (UnitState == "Landing")
 				{
-					unitsStateAnimationList = SelectedUnit.HitStunAnimations;
+					unitsStateAnimationList = SelectedUnit.LandingAnimations;
 				}
 
 				return unitsStateAnimationList;
