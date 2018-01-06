@@ -114,6 +114,44 @@ namespace UnitEditor
 					SelectedUnit.MovementSpeed = result;
 				}
 			}
+			
+			if (SelectedUnit != null)
+			{
+				StateAnimation selectedAnimation = GetCurrentStateAnimation();
+				if (selectedAnimation != null)
+				{
+					if (ListOfHurtAndHitBoxes.SelectedItem != null)
+					{
+						ListBoxItem selectedHitOrHurtBoxItem = (ListBoxItem)ListOfHurtAndHitBoxes.SelectedItem;
+						string selectedHitOrHurtBoxName = selectedHitOrHurtBoxItem.Content.ToString();
+						HitOrHurtBox selectedHitOrHurtBox;
+						bool isHitBox = selectedHitOrHurtBoxName.Contains("Hit");
+
+						if (isHitBox)
+						{
+							selectedHitOrHurtBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+						}
+						else
+						{
+							selectedHitOrHurtBox = selectedAnimation.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+						}
+
+						if (selectedHitOrHurtBox != null)
+						{
+							try
+							{
+								int.TryParse(DamageTextBox.Text, out selectedHitOrHurtBox.Damage);
+								float.TryParse(KnockBackXTextBox.Text, out selectedHitOrHurtBox.KnockBackX);
+								float.TryParse(KnockBackYTextBox.Text, out selectedHitOrHurtBox.KnockBackY);
+							}
+							catch (Exception error)
+							{
+
+							}
+						}
+					}
+				}
+			}
 		}
 
 		private void Draw(object sender, EventArgs e)
@@ -152,8 +190,8 @@ namespace UnitEditor
 			double maxY = FrameCanvas.ActualHeight / 2.0 - animatedSprite.PixelHeight / 2.0;
 
 			spriteImage.Source = animatedSprite;
-			spriteImage.Width = animatedSprite.PixelWidth;
-			spriteImage.Height = animatedSprite.PixelWidth;
+			//spriteImage.Width = animatedSprite.PixelWidth;
+			//spriteImage.Height = animatedSprite.PixelWidth;
 			Canvas.SetLeft(spriteImage, maxX);
 			Canvas.SetTop(spriteImage, maxY);
 
@@ -1426,7 +1464,8 @@ namespace UnitEditor
 									if (selectedHitOrHurtBoxName == selectedAnimation.HitBoxPerFrame[i][box].Name)
 									{
 										FrameCanvas.Children.Remove(selectedAnimation.HitBoxPerFrame[i][box].DrawRectangle);
-										selectedAnimation.HitBoxPerFrame[i].RemoveAt(i);
+										selectedAnimation.HitBoxPerFrame[i][box].DrawRectangle = null;
+										selectedAnimation.HitBoxPerFrame[i].RemoveAt(box);
 										breakOutOfForLoops = true;
 										break;
 									}
@@ -1447,6 +1486,7 @@ namespace UnitEditor
 									if (selectedHitOrHurtBoxName == selectedAnimation.HurtBoxPerFrame[i][box].Name)
 									{
 										FrameCanvas.Children.Remove(selectedAnimation.HurtBoxPerFrame[i][box].DrawRectangle);
+										selectedAnimation.HurtBoxPerFrame[i][box].DrawRectangle = null;
 										selectedAnimation.HurtBoxPerFrame[i].RemoveAt(box);
 										breakOutOfForLoops = true;
 										break;
@@ -1467,7 +1507,7 @@ namespace UnitEditor
 							{
 								if (selectedHitOrHurtBoxName == selectedAnimation.HitOrHurtBoxListItems[i][box].Content.ToString())
 								{
-									selectedAnimation.HitOrHurtBoxListItems.RemoveAt(i);
+									selectedAnimation.HitOrHurtBoxListItems[i].RemoveAt(box);
 									breakOutOfForLoops = true;
 									break;
 								}
