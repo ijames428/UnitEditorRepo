@@ -21,7 +21,7 @@
 			<ListBox Name="ListOfUnits" Canvas.Top="76" Height="143" Width="243">
 			</ListBox>
 
-			<ListBox Name="ListOfStates" Canvas.Top="283" Height="117" Width="118" Canvas.Right="10" Canvas.Left="0">
+			<ListBox Name="ListOfStates" Canvas.Top="303" Height="117" Width="118" Canvas.Right="10" Canvas.Left="0">
 				<ListBoxItem Name="IdleState" Content="Idle" Selected="OnStateSelected"></ListBoxItem>
 				<ListBoxItem Name="WalkingState" Content="Walking" Selected="OnStateSelected"></ListBoxItem>
 				<ListBoxItem Name="RunningState" Content="Running" Selected="OnStateSelected"></ListBoxItem>
@@ -34,11 +34,12 @@
 				<ListBoxItem Name="JumpApexState" Content="Jump Apex" Selected="OnStateSelected"></ListBoxItem>
 				<ListBoxItem Name="FallingState" Content="Falling" Selected="OnStateSelected"></ListBoxItem>
 				<ListBoxItem Name="LandingState" Content="Landing" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="TalkingState" Content="Talking" Selected="OnStateSelected"></ListBoxItem>
 			</ListBox>
 
-			<Button Name="AddAnimationButton" Height="25" Width="120" Click="AddAnimationButton_Click" Canvas.Right="120" Canvas.Top="573" Canvas.Left="0">Add Animation</Button>
-			<Button Name="DeleteAnimationButton" Height="25" Width="120" Click="DeleteAnimationButton_Click" Canvas.Right="120" Canvas.Top="573" Canvas.Left="125">Delete Animation</Button>
-			<ListBox Name="ListOfStateAnimations" Canvas.Top="405" Height="163" Width="243" Canvas.Right="10" Canvas.Left="0"></ListBox>
+			<Button Name="AddAnimationButton" Height="25" Width="120" Click="AddAnimationButton_Click" Canvas.Right="120" Canvas.Top="593" Canvas.Left="0">Add Animation</Button>
+			<Button Name="DeleteAnimationButton" Height="25" Width="120" Click="DeleteAnimationButton_Click" Canvas.Right="120" Canvas.Top="593" Canvas.Left="125">Delete Animation</Button>
+			<ListBox Name="ListOfStateAnimations" Canvas.Top="425" Height="163" Width="243" Canvas.Right="10" Canvas.Left="0"></ListBox>
 			<Label Name="numberOfFramesLabel" Canvas.Right="82" Canvas.Top="38">Number of Frames:</Label>
 			<TextBox Name="numberOfFramesTextBox" Canvas.Right="10" Canvas.Top="42" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="frameWidthLabel" Canvas.Right="82" Canvas.Top="56">Frame Width:</Label>
@@ -61,6 +62,8 @@
 			<TextBox Name="HitPointsTextBox" Canvas.Left="123" Canvas.Top="242" Width="120" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="MovementSpeedLabel" Canvas.Left="12" Canvas.Top="256">Movement Speed:</Label>
 			<TextBox Name="MovementSpeedTextBox" Canvas.Left="123" Canvas.Top="260" Width="120" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
+			<Label Name="InteractionRadiusLabel" Canvas.Left="10" Canvas.Top="274">Interaction Radius:</Label>
+			<TextBox Name="InteractionRadiusTextBox" Canvas.Left="123" Canvas.Top="278" Width="120" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<!--Label Name="frameWidthLabel" Canvas.Right="82" Canvas.Top="396">Frame Width:</Label-->
 			<!--TextBox Name="frameWidthTextBox" Canvas.Right="10" Canvas.Top="400" Width="75"></TextBox-->
 			<!--Label Name="frameHeightLabel"  Canvas.Right="82" Canvas.Top="414">Frame Height:</Label-->
@@ -94,6 +97,7 @@
 
 			<CheckBox Name="HitBoxCheckBox" Checked="HitBoxCheckBox_Checked" Canvas.Right="30" Canvas.Top="180" IsChecked="False">Hit Box</CheckBox>
 			<CheckBox Name="HurtBoxCheckBox" Checked="HurtBoxCheckBox_Checked" Canvas.Right="125" Canvas.Top="180" IsChecked="True">Hurt Box</CheckBox>
+
 			<Button Name="DeleteHitOrHurtBoxButton" Height="25" Width="120" Click="DeleteHitOrHurtBoxButton_Click" Canvas.Right="5" Canvas.Top="520">Delete Hit/Hurt Box</Button>
 			<Button Name="CopyBoxToNextFrameButton" Height="25" Width="150" Click="CopyBoxToNextFrameButton_Click" Canvas.Right="5" Canvas.Top="550">Copy Box To Next Frame</Button>
 		</Canvas>

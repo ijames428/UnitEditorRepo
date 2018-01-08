@@ -38,6 +38,7 @@ namespace UnitEditor
 		
 		SolidColorBrush HurtBoxColor = Brushes.Green;
 		SolidColorBrush HitBoxColor = Brushes.Red;
+		SolidColorBrush InteractionCircleColor = Brushes.Yellow;
 
 		CroppedBitmap animatedSprite;
 		Image spriteImage = new Image();
@@ -114,7 +115,18 @@ namespace UnitEditor
 					SelectedUnit.MovementSpeed = result;
 				}
 			}
-			
+
+			if (InteractionRadiusTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					float result = 0.0f;
+					float.TryParse(InteractionRadiusTextBox.Text, out result);
+
+					SelectedUnit.InteractionRadius = result;
+				}
+			}
+
 			if (SelectedUnit != null)
 			{
 				StateAnimation selectedAnimation = GetCurrentStateAnimation();
@@ -144,9 +156,9 @@ namespace UnitEditor
 								float.TryParse(KnockBackXTextBox.Text, out selectedHitOrHurtBox.KnockBackX);
 								float.TryParse(KnockBackYTextBox.Text, out selectedHitOrHurtBox.KnockBackY);
 							}
-							catch (Exception error)
+							catch (Exception exception)
 							{
-
+								string ignore_exception = exception.Message;
 							}
 						}
 					}
@@ -170,6 +182,7 @@ namespace UnitEditor
 				}
 				catch (Exception exception)
 				{
+					string ignore_exception = exception.Message;
 				}
 
 				if (AnimationState == ANIMATION_STATE_PLAY)
@@ -229,6 +242,20 @@ namespace UnitEditor
 						FrameCanvas.Children.Add(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle);
 					}
 				}
+			}
+
+			if (SelectedUnit != null && SelectedUnit.InteractionRadius > 0.0f)
+			{
+				Ellipse circle = new Ellipse();
+				circle.StrokeThickness = 2;
+				circle.Stroke = InteractionCircleColor;
+				circle.Height = SelectedUnit.InteractionRadius * 2.0f;
+				circle.Width = SelectedUnit.InteractionRadius * 2.0f;
+
+				Canvas.SetLeft(circle, (FrameCanvas.ActualWidth / 2.0f) - SelectedUnit.InteractionRadius);
+				Canvas.SetTop(circle, (FrameCanvas.ActualHeight / 2.0f) - SelectedUnit.InteractionRadius);
+
+				FrameCanvas.Children.Add(circle);
 			}
 		}
 
@@ -489,6 +516,10 @@ namespace UnitEditor
 				{
 					unitsStateAnimationList = SelectedUnit.LandingAnimations;
 				}
+				else if (UnitState == "Talking")
+				{
+					unitsStateAnimationList = SelectedUnit.TalkingAnimations;
+				}
 
 				return unitsStateAnimationList;
 			}
@@ -595,6 +626,7 @@ namespace UnitEditor
 				UnitNameTextBox.Text = SelectedUnit.UnitName;
 				HitPointsTextBox.Text = SelectedUnit.HitPoints.ToString();
 				MovementSpeedTextBox.Text = SelectedUnit.MovementSpeed.ToString();
+				InteractionRadiusTextBox.Text = SelectedUnit.InteractionRadius.ToString();
 			}
 		}
 
@@ -615,10 +647,12 @@ namespace UnitEditor
 			newUnit.UnitName = unitName;
 			newUnit.HitPoints = 1;
 			newUnit.MovementSpeed = 0.0f;
+			newUnit.InteractionRadius = 0.0f;
 
 			UnitNameTextBox.Text = newUnit.UnitName.ToString();
 			HitPointsTextBox.Text = newUnit.HitPoints.ToString();
 			MovementSpeedTextBox.Text = newUnit.MovementSpeed.ToString();
+			InteractionRadiusTextBox.Text = newUnit.InteractionRadius.ToString();
 
 			MyBestiary.DictOfUnits.Add(newUnit.UnitName, newUnit);
 
@@ -1044,6 +1078,7 @@ namespace UnitEditor
 					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.JumpApexAnimations);
 					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.FallingAnimations);
 					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.LandingAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.TalkingAnimations);
 				}
 
 				FrameCanvas.Children.Clear();
@@ -1635,6 +1670,7 @@ namespace UnitEditor
 		public string UnitName = "";
 		public int HitPoints = 0;
 		public float MovementSpeed = 0.0f;
+		public float InteractionRadius = 0.0f;
 		public List<StateAnimation> IdleAnimations = new List<StateAnimation>();
 		public List<StateAnimation> WalkingAnimations = new List<StateAnimation>();
 		public List<StateAnimation> RunningAnimations = new List<StateAnimation>();
@@ -1647,6 +1683,21 @@ namespace UnitEditor
 		public List<StateAnimation> JumpApexAnimations = new List<StateAnimation>();
 		public List<StateAnimation> FallingAnimations = new List<StateAnimation>();
 		public List<StateAnimation> LandingAnimations = new List<StateAnimation>();
+		public List<StateAnimation> TalkingAnimations = new List<StateAnimation>();
+
+		public int NumberOfIdleAnimations = 0;
+		public int NumberOfWalkingAnimations = 0;
+		public int NumberOfRunningAnimations = 0;
+		public int NumberOfDyingAnimations = 0;
+		public int NumberOfDeadAnimations = 0;
+		public int NumberOfAttackingAnimations = 0;
+		public int NumberOfBlockingAnimations = 0;
+		public int NumberOfHitStunAnimations = 0;
+		public int NumberOfJumpingAnimations = 0;
+		public int NumberOfJumpApexAnimations = 0;
+		public int NumberOfFallingAnimations = 0;
+		public int NumberOfLandingAnimations = 0;
+		public int NumberOfTalkingAnimations = 0;
 
 		public Unit()
 		{
