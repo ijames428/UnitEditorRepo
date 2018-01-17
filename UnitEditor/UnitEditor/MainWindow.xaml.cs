@@ -127,6 +127,57 @@ namespace UnitEditor
 				}
 			}
 
+			if (SwingingSoundFileTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					StateAnimation anim = GetCurrentStateAnimation();
+					if (anim != null)
+					{
+						while (anim.AttackSoundFilePerFrame.Count <= CurrentFrame)
+						{
+							anim.AttackSoundFilePerFrame.Add("");
+						}
+
+						anim.AttackSoundFilePerFrame[CurrentFrame] = SwingingSoundFileTextBox.Text;
+					}
+				}
+			}
+
+			if (RightFootSoundFileTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					StateAnimation anim = GetCurrentStateAnimation();
+					if (anim != null)
+					{
+						while (anim.RightFootSoundFilePerFrame.Count <= CurrentFrame)
+						{
+							anim.RightFootSoundFilePerFrame.Add("");
+						}
+
+						anim.RightFootSoundFilePerFrame[CurrentFrame] = RightFootSoundFileTextBox.Text;
+					}
+				}
+			}
+
+			if (LeftFootSoundFileTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					StateAnimation anim = GetCurrentStateAnimation();
+					if (anim != null)
+					{
+						while (anim.LeftFootSoundFilePerFrame.Count <= CurrentFrame)
+						{
+							anim.LeftFootSoundFilePerFrame.Add("");
+						}
+
+						anim.LeftFootSoundFilePerFrame[CurrentFrame] = LeftFootSoundFileTextBox.Text;
+					}
+				}
+			}
+
 			if (SelectedUnit != null)
 			{
 				StateAnimation selectedAnimation = GetCurrentStateAnimation();
@@ -187,8 +238,8 @@ namespace UnitEditor
 
 				if (AnimationState == ANIMATION_STATE_PLAY)
 				{
-					ChangeFrameInfo();
 					GoToNextFrame();
+					ChangeFrameInfo();
 				}
 			}
 		}
@@ -241,6 +292,33 @@ namespace UnitEditor
 						Canvas.SetTop(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HurtBoxPerFrame[CurrentFrame][i].DrawRect.Y);
 						FrameCanvas.Children.Add(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle);
 					}
+				}
+
+				if (anim.AttackSoundFilePerFrame.Any() && anim.AttackSoundFilePerFrame.Count > CurrentFrame)
+				{
+					SwingingSoundFileTextBox.Text = anim.AttackSoundFilePerFrame[CurrentFrame];
+				}
+				else
+				{
+					SwingingSoundFileTextBox.Text = "";
+				}
+
+				if (anim.RightFootSoundFilePerFrame.Any() && anim.RightFootSoundFilePerFrame.Count > CurrentFrame)
+				{
+					RightFootSoundFileTextBox.Text = anim.RightFootSoundFilePerFrame[CurrentFrame];
+				}
+				else
+				{
+					RightFootSoundFileTextBox.Text = "";
+				}
+
+				if (anim.LeftFootSoundFilePerFrame.Any() && anim.LeftFootSoundFilePerFrame.Count > CurrentFrame)
+				{
+					LeftFootSoundFileTextBox.Text = anim.LeftFootSoundFilePerFrame[CurrentFrame];
+				}
+				else
+				{
+					LeftFootSoundFileTextBox.Text = "";
 				}
 			}
 
@@ -627,6 +705,18 @@ namespace UnitEditor
 				HitPointsTextBox.Text = SelectedUnit.HitPoints.ToString();
 				MovementSpeedTextBox.Text = SelectedUnit.MovementSpeed.ToString();
 				InteractionRadiusTextBox.Text = SelectedUnit.InteractionRadius.ToString();
+
+				JumpingSoundFileTextBox.Text = SelectedUnit.JumpingSoundFile;
+				LandingSoundFileTextBox.Text = SelectedUnit.LandingSoundFile;
+
+				ListOfGettingHitSoundFiles.Items.Clear();
+				for (int i = 0; i < SelectedUnit.GettingHitSoundFiles.Count; i++)
+				{
+					ListBoxItem new_item = new ListBoxItem();
+					new_item.Content = SelectedUnit.GettingHitSoundFiles[i];
+
+					ListOfGettingHitSoundFiles.Items.Add(new_item);
+				}
 			}
 		}
 
@@ -1030,6 +1120,22 @@ namespace UnitEditor
 					isDataDirty = false;
 				}
 			}
+		}
+
+		private string SelectSoundFile()
+		{
+			OpenFileDialog openFileDialog = new OpenFileDialog();
+
+			openFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+			openFileDialog.FilterIndex = 2;
+			openFileDialog.RestoreDirectory = true;
+
+			if (openFileDialog.ShowDialog() == true)
+			{
+				return openFileDialog.FileName;
+			}
+
+			return "";
 		}
 
 		private void Open(object sender, RoutedEventArgs e)
@@ -1652,6 +1758,126 @@ namespace UnitEditor
 				}
 			}
 		}
+
+		private void JumpingSoundFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (SelectedUnit != null)
+			{
+				SelectedUnit.JumpingSoundFile = SelectSoundFile();
+				JumpingSoundFileTextBox.Text = SelectedUnit.JumpingSoundFile;
+			}
+		}
+
+		private void LandingSoundFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (SelectedUnit != null)
+			{
+				SelectedUnit.LandingSoundFile = SelectSoundFile();
+				LandingSoundFileTextBox.Text = SelectedUnit.LandingSoundFile;
+			}
+		}
+
+		private void LeftFootSoundFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (SelectedUnit != null)
+			{
+				StateAnimation anim = GetCurrentStateAnimation();
+
+				if (anim != null)
+				{
+					while (anim.LeftFootSoundFilePerFrame.Count <= CurrentFrame)
+					{
+						anim.LeftFootSoundFilePerFrame.Add("");
+					}
+
+					if (anim.LeftFootSoundFilePerFrame.Count > CurrentFrame)
+					{
+						anim.LeftFootSoundFilePerFrame[CurrentFrame] = SelectSoundFile();
+						LeftFootSoundFileTextBox.Text = anim.LeftFootSoundFilePerFrame[CurrentFrame];
+					}
+				}
+			}
+		}
+
+		private void RightFootSoundFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (SelectedUnit != null)
+			{
+				StateAnimation anim = GetCurrentStateAnimation();
+
+				if (anim != null)
+				{
+					while (anim.RightFootSoundFilePerFrame.Count <= CurrentFrame)
+					{
+						anim.RightFootSoundFilePerFrame.Add("");
+					}
+
+					if (anim.RightFootSoundFilePerFrame.Count > CurrentFrame)
+					{
+						anim.RightFootSoundFilePerFrame[CurrentFrame] = SelectSoundFile();
+						RightFootSoundFileTextBox.Text = anim.RightFootSoundFilePerFrame[CurrentFrame];
+					}
+				}
+			}
+		}
+
+		private void AddGettingHitSoundFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (SelectedUnit != null)
+			{
+				string new_getting_hit_sound_file = SelectSoundFile();
+
+				ListBoxItem new_item = new ListBoxItem();
+				new_item.Content = new_getting_hit_sound_file;
+
+				ListOfGettingHitSoundFiles.Items.Add(new_item);
+
+				SelectedUnit.GettingHitSoundFiles.Add(new_getting_hit_sound_file);
+			}
+		}
+
+		private void DeleteGettingHitSoundFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (SelectedUnit != null)
+			{
+				ListBoxItem selected_item = (ListBoxItem)ListOfGettingHitSoundFiles.SelectedItem;
+				if (selected_item != null)
+				{
+					for (int i = 0; i < SelectedUnit.GettingHitSoundFiles.Count; i++)
+					{
+						if (SelectedUnit.GettingHitSoundFiles[i] == selected_item.Content.ToString())
+						{
+							SelectedUnit.GettingHitSoundFiles.RemoveAt(i);
+							break;
+						}
+					}
+
+					ListOfGettingHitSoundFiles.Items.Remove(selected_item);
+				}
+			}
+		}
+
+		private void SwingingSoundFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (SelectedUnit != null)
+			{
+				StateAnimation anim = GetCurrentStateAnimation();
+
+				if (anim != null)
+				{
+					while (anim.AttackSoundFilePerFrame.Count <= CurrentFrame)
+					{
+						anim.AttackSoundFilePerFrame.Add("");
+					}
+
+					if (anim.AttackSoundFilePerFrame.Count > CurrentFrame)
+					{
+						anim.AttackSoundFilePerFrame[CurrentFrame] = SelectSoundFile();
+						SwingingSoundFileTextBox.Text = anim.AttackSoundFilePerFrame[CurrentFrame];
+					}
+				}
+			}
+		}
 	}
 
 	public class Bestiary
@@ -1671,6 +1897,11 @@ namespace UnitEditor
 		public int HitPoints = 0;
 		public float MovementSpeed = 0.0f;
 		public float InteractionRadius = 0.0f;
+		
+		public string JumpingSoundFile = "";
+		public string LandingSoundFile = "";
+		public List<string> GettingHitSoundFiles = new List<string>();
+
 		public List<StateAnimation> IdleAnimations = new List<StateAnimation>();
 		public List<StateAnimation> WalkingAnimations = new List<StateAnimation>();
 		public List<StateAnimation> RunningAnimations = new List<StateAnimation>();
@@ -1715,6 +1946,9 @@ namespace UnitEditor
 		public int FrameDimensionsY = 0;
 		public int FramesPerRow = 0;
 		public int FramesPerColumn = 0;
+		public List<string> AttackSoundFilePerFrame = new List<string>();
+		public List<string> RightFootSoundFilePerFrame = new List<string>();
+		public List<string> LeftFootSoundFilePerFrame = new List<string>();
 		public List<List<HitOrHurtBox>> HurtBoxPerFrame = new List<List<HitOrHurtBox>>();
 		public List<List<HitOrHurtBox>> HitBoxPerFrame = new List<List<HitOrHurtBox>>();
 		[JsonIgnore]
