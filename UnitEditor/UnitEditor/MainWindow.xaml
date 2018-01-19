@@ -35,6 +35,8 @@
 				<ListBoxItem Name="FallingState" Content="Falling" Selected="OnStateSelected"></ListBoxItem>
 				<ListBoxItem Name="LandingState" Content="Landing" Selected="OnStateSelected"></ListBoxItem>
 				<ListBoxItem Name="TalkingState" Content="Talking" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="ProjectileActiveState" Content="Projectile Active" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="ProjectileHitState" Content="Projectile Hit" Selected="OnStateSelected"></ListBoxItem>
 			</ListBox>
 
 			<Button Name="AddAnimationButton" Height="25" Width="120" Click="AddAnimationButton_Click" Canvas.Right="120" Canvas.Top="593" Canvas.Left="0">Add Animation</Button>
@@ -66,6 +68,10 @@
 			<TextBox Name="RightFootSoundFileTextBox" Canvas.Right="5" Canvas.Top="650" Width="125" Height="25" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Button Name="LeftFootSoundFileButton" Height="25" Width="90" Click="LeftFootSoundFileButton_Click" Canvas.Top="675" Canvas.Right="130">Left Foot Sound</Button>
 			<TextBox Name="LeftFootSoundFileTextBox" Canvas.Right="5" Canvas.Top="675" Width="125" Height="25" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
+			<Button Name="ThrowProjectileSoundFileButton" Height="25" Width="90" Click="ThrowProjectileSoundFileButton_Click" Canvas.Top="700" Canvas.Right="130">Throw Projectile Sound</Button>
+			<TextBox Name="ThrowProjectileSoundFileTextBox" Canvas.Right="5" Canvas.Top="700" Width="125" Height="25" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
+			<Button Name="ProjectileHitSoundFileButton" Height="25" Width="90" Click="ProjectileHitSoundFileButton_Click" Canvas.Top="725" Canvas.Right="130">Projectile Hit Sound</Button>
+			<TextBox Name="ProjectileHitSoundFileTextBox" Canvas.Right="5" Canvas.Top="725" Width="125" Height="25" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 
 			<Label Name="framesPerSecondLabel" Canvas.Right="182" Canvas.Top="140">FPS:</Label>
 			<TextBox Name="framesPerSecondTextBox" Canvas.Right="150" Canvas.Top="144" Width="35" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
@@ -116,6 +122,7 @@
 
 			<Button Name="DeleteHitOrHurtBoxButton" Height="25" Width="120" Click="DeleteHitOrHurtBoxButton_Click" Canvas.Right="5" Canvas.Top="520">Delete Hit/Hurt Box</Button>
 			<Button Name="CopyBoxToNextFrameButton" Height="25" Width="150" Click="CopyBoxToNextFrameButton_Click" Canvas.Right="5" Canvas.Top="550">Copy Box To Next Frame</Button>
+			<Button Name="CopyBoxToEveryFrameButton" Height="25" Width="150" Click="CopyBoxToEveryFrameButton_Click" Canvas.Right="5" Canvas.Top="580">Copy Box To Every Frame</Button>
 		</Canvas>
 		<Canvas Name="FrameCanvas" Background="Black" Margin="250, 10, 220, 10"
 				MouseUp="CanvasUp" MouseDown="CanvasDown" MouseMove="CanvasMove">

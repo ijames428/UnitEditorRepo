@@ -82,6 +82,81 @@ namespace UnitEditor
 				}
 			}
 
+			if (frameWidthTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					StateAnimation anim = GetCurrentStateAnimation();
+					if (anim != null)
+					{
+						int result = 0;
+						int.TryParse(frameWidthTextBox.Text, out result);
+						
+						anim.FrameDimensionsX = result;
+					}
+				}
+			}
+
+			if (frameHeightTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					StateAnimation anim = GetCurrentStateAnimation();
+					if (anim != null)
+					{
+						int result = 0;
+						int.TryParse(frameHeightTextBox.Text, out result);
+
+						anim.FrameDimensionsY = result;
+					}
+				}
+			}
+
+			if (numberOfFramesTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					StateAnimation anim = GetCurrentStateAnimation();
+					if (anim != null)
+					{
+						int result = 0;
+						int.TryParse(numberOfFramesTextBox.Text, out result);
+
+						anim.NumberOfFrames = result;
+					}
+				}
+			}
+
+			if (framesPerRowTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					StateAnimation anim = GetCurrentStateAnimation();
+					if (anim != null)
+					{
+						int result = 0;
+						int.TryParse(framesPerRowTextBox.Text, out result);
+
+						anim.FramesPerRow = result;
+					}
+				}
+			}
+
+			if (framesPerColumnTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					StateAnimation anim = GetCurrentStateAnimation();
+					if (anim != null)
+					{
+						int result = 0;
+						int.TryParse(framesPerColumnTextBox.Text, out result);
+
+						anim.FramesPerColumn = result;
+					}
+				}
+			}
+
 			if (UnitNameTextBox.IsFocused)
 			{
 				if (SelectedUnit != null)
@@ -178,7 +253,41 @@ namespace UnitEditor
 				}
 			}
 
-			if (SelectedUnit != null)
+			if (ThrowProjectileSoundFileTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					StateAnimation anim = GetCurrentStateAnimation();
+					if (anim != null)
+					{
+						while (anim.ThrowProjectileSoundFilePerFrame.Count <= CurrentFrame)
+						{
+							anim.ThrowProjectileSoundFilePerFrame.Add("");
+						}
+
+						anim.ThrowProjectileSoundFilePerFrame[CurrentFrame] = ThrowProjectileSoundFileTextBox.Text;
+					}
+				}
+			}
+
+			if (ProjectileHitSoundFileTextBox.IsFocused)
+			{
+				if (SelectedUnit != null)
+				{
+					StateAnimation anim = GetCurrentStateAnimation();
+					if (anim != null)
+					{
+						while (anim.ProjectileHitSoundFilePerFrame.Count <= CurrentFrame)
+						{
+							anim.ProjectileHitSoundFilePerFrame.Add("");
+						}
+
+						anim.ProjectileHitSoundFilePerFrame[CurrentFrame] = ProjectileHitSoundFileTextBox.Text;
+					}
+				}
+			}
+
+			if ((DamageTextBox.IsFocused || KnockBackXTextBox.IsFocused || KnockBackYTextBox.IsFocused) && SelectedUnit != null)
 			{
 				StateAnimation selectedAnimation = GetCurrentStateAnimation();
 				if (selectedAnimation != null)
@@ -319,6 +428,24 @@ namespace UnitEditor
 				else
 				{
 					LeftFootSoundFileTextBox.Text = "";
+				}
+
+				if (anim.ThrowProjectileSoundFilePerFrame.Any() && anim.ThrowProjectileSoundFilePerFrame.Count > CurrentFrame)
+				{
+					ThrowProjectileSoundFileTextBox.Text = anim.ThrowProjectileSoundFilePerFrame[CurrentFrame];
+				}
+				else
+				{
+					ThrowProjectileSoundFileTextBox.Text = "";
+				}
+
+				if (anim.ProjectileHitSoundFilePerFrame.Any() && anim.ProjectileHitSoundFilePerFrame.Count > CurrentFrame)
+				{
+					ProjectileHitSoundFileTextBox.Text = anim.ProjectileHitSoundFilePerFrame[CurrentFrame];
+				}
+				else
+				{
+					ProjectileHitSoundFileTextBox.Text = "";
 				}
 			}
 
@@ -597,6 +724,14 @@ namespace UnitEditor
 				else if (UnitState == "Talking")
 				{
 					unitsStateAnimationList = SelectedUnit.TalkingAnimations;
+				}
+				else if (UnitState == "Projectile Active")
+				{
+					unitsStateAnimationList = SelectedUnit.ProjectileActiveAnimations;
+				}
+				else if (UnitState == "Projectile Hit")
+				{
+					unitsStateAnimationList = SelectedUnit.ProjectileHitAnimations;
 				}
 
 				return unitsStateAnimationList;
@@ -1185,6 +1320,8 @@ namespace UnitEditor
 					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.FallingAnimations);
 					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.LandingAnimations);
 					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.TalkingAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.ProjectileActiveAnimations);
+					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.ProjectileHitAnimations);
 				}
 
 				FrameCanvas.Children.Clear();
@@ -1316,7 +1453,12 @@ namespace UnitEditor
 			{
 				if (framesPerSecondTextBox.Text == string.Empty)
 				{
-					return 1;
+					if (!framesPerSecondTextBox.IsFocused)
+					{
+						framesPerSecondTextBox.Text = "120";
+					}
+
+					return 120;
 				}
 
 				int frames = 1;
@@ -1878,6 +2020,100 @@ namespace UnitEditor
 				}
 			}
 		}
+
+		private void ThrowProjectileSoundFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (SelectedUnit != null)
+			{
+				StateAnimation anim = GetCurrentStateAnimation();
+
+				if (anim != null)
+				{
+					while (anim.ThrowProjectileSoundFilePerFrame.Count <= CurrentFrame)
+					{
+						anim.ThrowProjectileSoundFilePerFrame.Add("");
+					}
+
+					if (anim.ThrowProjectileSoundFilePerFrame.Count > CurrentFrame)
+					{
+						anim.ThrowProjectileSoundFilePerFrame[CurrentFrame] = SelectSoundFile();
+						ThrowProjectileSoundFileTextBox.Text = anim.ThrowProjectileSoundFilePerFrame[CurrentFrame];
+					}
+				}
+			}
+		}
+
+		private void ProjectileHitSoundFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (SelectedUnit != null)
+			{
+				StateAnimation anim = GetCurrentStateAnimation();
+
+				if (anim != null)
+				{
+					while (anim.ProjectileHitSoundFilePerFrame.Count <= CurrentFrame)
+					{
+						anim.ProjectileHitSoundFilePerFrame.Add("");
+					}
+
+					if (anim.ProjectileHitSoundFilePerFrame.Count > CurrentFrame)
+					{
+						anim.ProjectileHitSoundFilePerFrame[CurrentFrame] = SelectSoundFile();
+						ProjectileHitSoundFileTextBox.Text = anim.ProjectileHitSoundFilePerFrame[CurrentFrame];
+					}
+				}
+			}
+		}
+
+		private void CopyBoxToEveryFrameButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (ListOfHurtAndHitBoxes.SelectedItem != null)
+			{
+				ListBoxItem selectedAnimationItem = (ListBoxItem)ListOfStateAnimations.SelectedItem;
+				string selectedAnimationName = selectedAnimationItem.Content.ToString();
+				StateAnimation selectedAnimation = GetCurrentStateAnimation(selectedAnimationName);
+				
+				ListBoxItem selectedHitOrHurtBoxItem = (ListBoxItem)ListOfHurtAndHitBoxes.SelectedItem;
+				string selectedHitOrHurtBoxName = selectedHitOrHurtBoxItem.Content.ToString();
+				HitOrHurtBox origHitOrHurtBox;
+				bool isHitBox = selectedHitOrHurtBoxName.Contains("Hit");
+
+				if (isHitBox)
+				{
+					origHitOrHurtBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+				}
+				else
+				{
+					origHitOrHurtBox = selectedAnimation.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+				}
+
+				if (origHitOrHurtBox != null)
+				{
+					for (int i = 0; i < NumberOfFrames; i++)
+					{
+						if (i != CurrentFrame)
+						{
+							HitOrHurtBox newHitOrHurtBox = new HitOrHurtBox();
+							newHitOrHurtBox.Box.X = origHitOrHurtBox.Box.X;
+							newHitOrHurtBox.Box.Y = origHitOrHurtBox.Box.Y;
+							newHitOrHurtBox.Box.Width = origHitOrHurtBox.Box.Width;
+							newHitOrHurtBox.Box.Height = origHitOrHurtBox.Box.Height;
+							newHitOrHurtBox.DrawRect.X = origHitOrHurtBox.DrawRect.X;
+							newHitOrHurtBox.DrawRect.Y = origHitOrHurtBox.DrawRect.Y;
+							newHitOrHurtBox.DrawRect.Width = origHitOrHurtBox.DrawRect.Width;
+							newHitOrHurtBox.DrawRect.Height = origHitOrHurtBox.DrawRect.Height;
+							newHitOrHurtBox.DrawRectangle = origHitOrHurtBox.DrawRectangle;
+							newHitOrHurtBox.Damage = origHitOrHurtBox.Damage;
+							newHitOrHurtBox.KnockBackX = origHitOrHurtBox.KnockBackX;
+							newHitOrHurtBox.KnockBackY = origHitOrHurtBox.KnockBackY;
+							newHitOrHurtBox.Frame = i;
+
+							AddNewHitOrHurtBox(selectedAnimation, newHitOrHurtBox, i, isHitBox, false);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public class Bestiary
@@ -1915,20 +2151,8 @@ namespace UnitEditor
 		public List<StateAnimation> FallingAnimations = new List<StateAnimation>();
 		public List<StateAnimation> LandingAnimations = new List<StateAnimation>();
 		public List<StateAnimation> TalkingAnimations = new List<StateAnimation>();
-
-		public int NumberOfIdleAnimations = 0;
-		public int NumberOfWalkingAnimations = 0;
-		public int NumberOfRunningAnimations = 0;
-		public int NumberOfDyingAnimations = 0;
-		public int NumberOfDeadAnimations = 0;
-		public int NumberOfAttackingAnimations = 0;
-		public int NumberOfBlockingAnimations = 0;
-		public int NumberOfHitStunAnimations = 0;
-		public int NumberOfJumpingAnimations = 0;
-		public int NumberOfJumpApexAnimations = 0;
-		public int NumberOfFallingAnimations = 0;
-		public int NumberOfLandingAnimations = 0;
-		public int NumberOfTalkingAnimations = 0;
+		public List<StateAnimation> ProjectileActiveAnimations = new List<StateAnimation>();
+		public List<StateAnimation> ProjectileHitAnimations = new List<StateAnimation>();
 
 		public Unit()
 		{
@@ -1949,6 +2173,8 @@ namespace UnitEditor
 		public List<string> AttackSoundFilePerFrame = new List<string>();
 		public List<string> RightFootSoundFilePerFrame = new List<string>();
 		public List<string> LeftFootSoundFilePerFrame = new List<string>();
+		public List<string> ThrowProjectileSoundFilePerFrame = new List<string>();
+		public List<string> ProjectileHitSoundFilePerFrame = new List<string>();
 		public List<List<HitOrHurtBox>> HurtBoxPerFrame = new List<List<HitOrHurtBox>>();
 		public List<List<HitOrHurtBox>> HitBoxPerFrame = new List<List<HitOrHurtBox>>();
 		[JsonIgnore]
