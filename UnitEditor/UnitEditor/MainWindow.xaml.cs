@@ -34,11 +34,12 @@ namespace UnitEditor
 
 		string previouslySelectedAnimationsName = "";
 
-		HitOrHurtBox previouslySelectedHitOrHurtBox = null;
+		AnimationInformationBox previouslySelectedAnimationInformationBox = null;
 		
 		SolidColorBrush HurtBoxColor = Brushes.Green;
 		SolidColorBrush HitBoxColor = Brushes.Red;
 		SolidColorBrush InteractionCircleColor = Brushes.Yellow;
+		SolidColorBrush ProjectileSpawnBoxColor = Brushes.Violet;
 
 		CroppedBitmap animatedSprite;
 		Image spriteImage = new Image();
@@ -287,34 +288,39 @@ namespace UnitEditor
 				}
 			}
 
-			if ((DamageTextBox.IsFocused || KnockBackXTextBox.IsFocused || KnockBackYTextBox.IsFocused) && SelectedUnit != null)
+			if ((DamageTextBox.IsFocused || KnockBackXTextBox.IsFocused || KnockBackYTextBox.IsFocused || ProjectileSpeedXTextBox.IsFocused || ProjectileSpeedYTextBox.IsFocused) && SelectedUnit != null)
 			{
 				StateAnimation selectedAnimation = GetCurrentStateAnimation();
 				if (selectedAnimation != null)
 				{
-					if (ListOfHurtAndHitBoxes.SelectedItem != null)
+					if (ListOfAnimationInformationBoxes.SelectedItem != null)
 					{
-						ListBoxItem selectedHitOrHurtBoxItem = (ListBoxItem)ListOfHurtAndHitBoxes.SelectedItem;
-						string selectedHitOrHurtBoxName = selectedHitOrHurtBoxItem.Content.ToString();
-						HitOrHurtBox selectedHitOrHurtBox;
-						bool isHitBox = selectedHitOrHurtBoxName.Contains("Hit");
+						ListBoxItem selectedAnimationInformationBoxItem = (ListBoxItem)ListOfAnimationInformationBoxes.SelectedItem;
+						string selectedAnimationInformationBoxName = selectedAnimationInformationBoxItem.Content.ToString();
+						AnimationInformationBox selectedAnimationInformationBox;
 
-						if (isHitBox)
+						if (selectedAnimationInformationBoxName.Contains("Hit"))
 						{
-							selectedHitOrHurtBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+							selectedAnimationInformationBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
 						}
-						else
+						else if (selectedAnimationInformationBoxName.Contains("Hurt"))
 						{
-							selectedHitOrHurtBox = selectedAnimation.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+							selectedAnimationInformationBox = selectedAnimation.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
+						}
+						else// if (selectedAnimationInformationBoxName.Contains("Projectile Spawn"))
+						{
+							selectedAnimationInformationBox = selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
 						}
 
-						if (selectedHitOrHurtBox != null)
+						if (selectedAnimationInformationBox != null)
 						{
 							try
 							{
-								int.TryParse(DamageTextBox.Text, out selectedHitOrHurtBox.Damage);
-								float.TryParse(KnockBackXTextBox.Text, out selectedHitOrHurtBox.KnockBackX);
-								float.TryParse(KnockBackYTextBox.Text, out selectedHitOrHurtBox.KnockBackY);
+								int.TryParse(DamageTextBox.Text, out selectedAnimationInformationBox.Damage);
+								float.TryParse(KnockBackXTextBox.Text, out selectedAnimationInformationBox.KnockBackX);
+								float.TryParse(KnockBackYTextBox.Text, out selectedAnimationInformationBox.KnockBackY);
+								float.TryParse(ProjectileSpeedXTextBox.Text, out selectedAnimationInformationBox.ProjectileSpeedX);
+								float.TryParse(ProjectileSpeedYTextBox.Text, out selectedAnimationInformationBox.ProjectileSpeedY);
 							}
 							catch (Exception exception)
 							{
@@ -373,13 +379,13 @@ namespace UnitEditor
 			StateAnimation anim = GetCurrentStateAnimation();
 			if (anim != null)
 			{
-				ListOfHurtAndHitBoxes.Items.Clear();
+				ListOfAnimationInformationBoxes.Items.Clear();
 
-				if (anim.HitOrHurtBoxListItems.Any() && anim.HitOrHurtBoxListItems.Count > CurrentFrame && anim.HitOrHurtBoxListItems[CurrentFrame].Any())
+				if (anim.AnimationInformationBoxListItems.Any() && anim.AnimationInformationBoxListItems.Count > CurrentFrame && anim.AnimationInformationBoxListItems[CurrentFrame].Any())
 				{
-					for (i = 0; i < anim.HitOrHurtBoxListItems[CurrentFrame].Count; i++)
+					for (i = 0; i < anim.AnimationInformationBoxListItems[CurrentFrame].Count; i++)
 					{
-						ListOfHurtAndHitBoxes.Items.Add(anim.HitOrHurtBoxListItems[CurrentFrame][i]);
+						ListOfAnimationInformationBoxes.Items.Add(anim.AnimationInformationBoxListItems[CurrentFrame][i]);
 					}
 				}
 
@@ -400,6 +406,16 @@ namespace UnitEditor
 						Canvas.SetLeft(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HurtBoxPerFrame[CurrentFrame][i].DrawRect.X);
 						Canvas.SetTop(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.HurtBoxPerFrame[CurrentFrame][i].DrawRect.Y);
 						FrameCanvas.Children.Add(anim.HurtBoxPerFrame[CurrentFrame][i].DrawRectangle);
+					}
+				}
+
+				if (anim.ProjectileSpawnBoxPerFrame.Any() && anim.ProjectileSpawnBoxPerFrame.Count > CurrentFrame && anim.ProjectileSpawnBoxPerFrame[CurrentFrame].Any())
+				{
+					for (i = 0; i < anim.ProjectileSpawnBoxPerFrame[CurrentFrame].Count; i++)
+					{
+						Canvas.SetLeft(anim.ProjectileSpawnBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.ProjectileSpawnBoxPerFrame[CurrentFrame][i].DrawRect.X);
+						Canvas.SetTop(anim.ProjectileSpawnBoxPerFrame[CurrentFrame][i].DrawRectangle, anim.ProjectileSpawnBoxPerFrame[CurrentFrame][i].DrawRect.Y);
+						FrameCanvas.Children.Add(anim.ProjectileSpawnBoxPerFrame[CurrentFrame][i].DrawRectangle);
 					}
 				}
 
@@ -615,7 +631,7 @@ namespace UnitEditor
 				}
 
 				SavePreviouslySelectedAnimationsInformation(previouslySelectedAnimationsName);
-				SavePreviouslySelectedHitOrHurtBoxValues();
+				SavepreviouslySelectedAnimationInformationBoxValues();
 
 				if (ListOfStateAnimations.Items.Count > 0)
 				{
@@ -743,7 +759,7 @@ namespace UnitEditor
 		private void OnAnimationSelected(object sender, RoutedEventArgs e)
 		{
 			SavePreviouslySelectedAnimationsInformation(previouslySelectedAnimationsName);
-			SavePreviouslySelectedHitOrHurtBoxValues();
+			SavepreviouslySelectedAnimationInformationBoxValues();
 
 			ListBoxItem item = (ListBoxItem)sender;
 			string name = item.Content.ToString();
@@ -757,11 +773,11 @@ namespace UnitEditor
 			framesPerRowTextBox.Text = anim.FramesPerRow.ToString();
 			framesPerColumnTextBox.Text = anim.FramesPerColumn.ToString();
 
-			ListOfHurtAndHitBoxes.Items.Clear();
+			ListOfAnimationInformationBoxes.Items.Clear();
 
-			for (int i = 0; i < anim.HitOrHurtBoxListItems.Count; i++)
+			for (int i = 0; i < anim.AnimationInformationBoxListItems.Count; i++)
 			{
-				ListOfHurtAndHitBoxes.Items.Add(anim.HitOrHurtBoxListItems[i]);
+				ListOfAnimationInformationBoxes.Items.Add(anim.AnimationInformationBoxListItems[i]);
 			}
 
 			OpenAndShowImage(anim.FilePath);
@@ -809,7 +825,7 @@ namespace UnitEditor
 		private void DeselectUnit()
 		{
 			ListOfStateAnimations.Items.Clear();
-			ListOfHurtAndHitBoxes.Items.Clear();
+			ListOfAnimationInformationBoxes.Items.Clear();
 			FrameCanvas.Children.Clear();
 			numberOfFramesTextBox.Text = "";
 			frameWidthTextBox.Text = "";
@@ -911,6 +927,10 @@ namespace UnitEditor
 				{
 					BoxColor = HitBoxColor;
 				}
+				else if (ProjectileSpawnCheckBox.IsChecked.HasValue && ProjectileSpawnCheckBox.IsChecked.Value)
+				{
+					BoxColor = ProjectileSpawnBoxColor;
+				}
 
 				rect_getting_drawn = new Rectangle
 				{
@@ -961,220 +981,192 @@ namespace UnitEditor
 				
 				StateAnimation anim = GetCurrentStateAnimation();
 
-				HitOrHurtBox newHitOrHurtBox = new HitOrHurtBox();
-				newHitOrHurtBox.Box.X = top_left_x - (FrameCanvas.ActualWidth / 2.0f);
-				newHitOrHurtBox.Box.Y = top_left_y - (FrameCanvas.ActualHeight / 2.0f);
-				newHitOrHurtBox.Box.Width = rect_getting_drawn.Width;
-				newHitOrHurtBox.Box.Height = rect_getting_drawn.Height;
-				newHitOrHurtBox.DrawRect.X = top_left_x;
-				newHitOrHurtBox.DrawRect.Y = top_left_y;
-				newHitOrHurtBox.DrawRect.Width = rect_getting_drawn.Width;
-				newHitOrHurtBox.DrawRect.Height = rect_getting_drawn.Height;
-				newHitOrHurtBox.DrawRectangle = rect_getting_drawn;
-				newHitOrHurtBox.Damage = 0;
-				newHitOrHurtBox.KnockBackX = 0.0f;
-				newHitOrHurtBox.KnockBackY = 0.0f;
-				newHitOrHurtBox.Frame = CurrentFrame;
+				AnimationInformationBox newAnimationInformationBox = new AnimationInformationBox();
+				newAnimationInformationBox.Box.X = top_left_x - (FrameCanvas.ActualWidth / 2.0f);
+				newAnimationInformationBox.Box.Y = top_left_y - (FrameCanvas.ActualHeight / 2.0f);
+				newAnimationInformationBox.Box.Width = rect_getting_drawn.Width;
+				newAnimationInformationBox.Box.Height = rect_getting_drawn.Height;
+				newAnimationInformationBox.DrawRect.X = top_left_x;
+				newAnimationInformationBox.DrawRect.Y = top_left_y;
+				newAnimationInformationBox.DrawRect.Width = rect_getting_drawn.Width;
+				newAnimationInformationBox.DrawRect.Height = rect_getting_drawn.Height;
+				newAnimationInformationBox.DrawRectangle = rect_getting_drawn;
+				newAnimationInformationBox.Damage = 0;
+				newAnimationInformationBox.KnockBackX = 0.0f;
+				newAnimationInformationBox.KnockBackY = 0.0f;
+				newAnimationInformationBox.Frame = CurrentFrame;
 
-				AddNewHitOrHurtBox(anim, newHitOrHurtBox, CurrentFrame, HitBoxCheckBox.IsChecked.HasValue && HitBoxCheckBox.IsChecked.Value, true);
+				string box_type = "";
+				if (HitBoxCheckBox.IsChecked.HasValue && HitBoxCheckBox.IsChecked.Value)
+				{
+					box_type = "Hit";
+				}
+				else if (HurtBoxCheckBox.IsChecked.HasValue && HurtBoxCheckBox.IsChecked.Value)
+				{
+					box_type = "Hurt";
+				}
+				else if (ProjectileSpawnCheckBox.IsChecked.HasValue && ProjectileSpawnCheckBox.IsChecked.Value)
+				{
+					box_type = "Projectile Spawn";
+				}
 
-				//if (HitBoxCheckBox.IsChecked.HasValue && HitBoxCheckBox.IsChecked.Value)
-				//{
-				//	while (anim.HitBoxPerFrame.Count <= CurrentFrame)
-				//	{
-				//		anim.HitBoxPerFrame.Add(new List<HitOrHurtBox>());
-				//	}
-				//
-				//	if (anim.HitBoxPerFrame.Count > CurrentFrame)
-				//	{
-				//		if (anim.HitBoxPerFrame[CurrentFrame] == null)
-				//		{
-				//			anim.HitBoxPerFrame[CurrentFrame] = new List<HitOrHurtBox>();
-				//		}
-				//
-				//		newHitOrHurtBox.Name = "Hit " + anim.HitBoxPerFrame[CurrentFrame].Where(x => x.Name.Contains("Hit")).ToList().Count.ToString();
-				//		anim.HitBoxPerFrame[CurrentFrame].Add(newHitOrHurtBox);
-				//	}
-				//}
-				//else
-				//{
-				//	while (anim.HurtBoxPerFrame.Count <= CurrentFrame)
-				//	{
-				//		anim.HurtBoxPerFrame.Add(new List<HitOrHurtBox>());
-				//	}
-				//
-				//	if (anim.HurtBoxPerFrame.Count > CurrentFrame)
-				//	{
-				//		if (anim.HurtBoxPerFrame[CurrentFrame] == null)
-				//		{
-				//			anim.HurtBoxPerFrame[CurrentFrame] = new List<HitOrHurtBox>();
-				//		}
-				//
-				//		newHitOrHurtBox.Name = "Hurt " + anim.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
-				//		anim.HurtBoxPerFrame[CurrentFrame].Add(newHitOrHurtBox);
-				//	}
-				//}
-				//
-				//ListBoxItem newListBoxItem = new ListBoxItem();
-				//newListBoxItem.Content = newHitOrHurtBox.Name;
-				//newListBoxItem.Selected += OnHitOrHurtBoxSelected;
-				//newListBoxItem.Unselected += OnHitOrHurtBoxUnselected;
-				//ListOfHurtAndHitBoxes.Items.Add(newListBoxItem);
-				//
-				////anim.HitOrHurtBoxListItems.Add(newListBoxItem);
-				//while (anim.HitOrHurtBoxListItems.Count <= CurrentFrame)
-				//{
-				//	anim.HitOrHurtBoxListItems.Add(new List<ListBoxItem>());
-				//}
-				//
-				//if (anim.HitOrHurtBoxListItems.Count > CurrentFrame)
-				//{
-				//	if (anim.HitOrHurtBoxListItems[CurrentFrame] == null)
-				//	{
-				//		anim.HitOrHurtBoxListItems[CurrentFrame] = new List<ListBoxItem>();
-				//	}
-				//
-				//	//newHitOrHurtBox.Name = "Hurt " + anim.HitOrHurtBoxListItems[CurrentFrame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
-				//	anim.HitOrHurtBoxListItems[CurrentFrame].Add(newListBoxItem);
-				//}
+				AddNewAnimationInformationBox(anim, newAnimationInformationBox, CurrentFrame, box_type, true);
 
-				xTextBox.Text = newHitOrHurtBox.Box.X.ToString();
-				yTextBox.Text = newHitOrHurtBox.Box.Y.ToString();
-				wTextBox.Text = newHitOrHurtBox.Box.Width.ToString();
-				hTextBox.Text = newHitOrHurtBox.Box.Height.ToString();
-				DamageTextBox.Text = newHitOrHurtBox.Damage.ToString();
-				KnockBackXTextBox.Text = newHitOrHurtBox.KnockBackX.ToString();
-				KnockBackYTextBox.Text = newHitOrHurtBox.KnockBackY.ToString();
-
-				//SerializedRectangle sRect = new SerializedRectangle();
-				//sRect.type = "Rectangle";
-				//sRect.name = name;
-				//sRect.x = top_left_x;
-				//sRect.y = top_left_y;
-				//sRect.width = (float)rect_getting_drawn.Width;
-				//sRect.height = (float)rect_getting_drawn.Height;
-
-				//sRects.Add(sRect);
-
-				//Select(name);
+				xTextBox.Text = newAnimationInformationBox.Box.X.ToString();
+				yTextBox.Text = newAnimationInformationBox.Box.Y.ToString();
+				wTextBox.Text = newAnimationInformationBox.Box.Width.ToString();
+				hTextBox.Text = newAnimationInformationBox.Box.Height.ToString();
+				DamageTextBox.Text = newAnimationInformationBox.Damage.ToString();
+				KnockBackXTextBox.Text = newAnimationInformationBox.KnockBackX.ToString();
+				KnockBackYTextBox.Text = newAnimationInformationBox.KnockBackY.ToString();
+				ProjectileSpeedXTextBox.Text = newAnimationInformationBox.ProjectileSpeedX.ToString();
+				ProjectileSpeedYTextBox.Text = newAnimationInformationBox.ProjectileSpeedY.ToString();
 
 				rect_getting_drawn = null;
 			}
 		}
 
-		private void AddNewHitOrHurtBox(StateAnimation anim, HitOrHurtBox newHitOrHurtBox, int frame, bool makingHitBox, bool addHitBoxToCurrentListBox)
+		private void AddNewAnimationInformationBox(StateAnimation anim, AnimationInformationBox newAnimationInformationBox, int frame, string name, bool addHitBoxToCurrentListBox)
 		{
-			if (makingHitBox)
+			if (name.Contains("Hit"))
 			{
 				while (anim.HitBoxPerFrame.Count <= frame)
 				{
-					anim.HitBoxPerFrame.Add(new List<HitOrHurtBox>());
+					anim.HitBoxPerFrame.Add(new List<AnimationInformationBox>());
 				}
-
+				
 				if (anim.HitBoxPerFrame.Count > frame)
 				{
 					if (anim.HitBoxPerFrame[frame] == null)
 					{
-						anim.HitBoxPerFrame[frame] = new List<HitOrHurtBox>();
+						anim.HitBoxPerFrame[frame] = new List<AnimationInformationBox>();
 					}
 
-					newHitOrHurtBox.Name = "Hit " + anim.HitBoxPerFrame[frame].Where(x => x.Name.Contains("Hit")).ToList().Count.ToString();
-					anim.HitBoxPerFrame[frame].Add(newHitOrHurtBox);
+					newAnimationInformationBox.Name = "Hit " + anim.HitBoxPerFrame[frame].Where(x => x.Name.Contains("Hit")).ToList().Count.ToString();
+					anim.HitBoxPerFrame[frame].Add(newAnimationInformationBox);
 				}
 			}
-			else
+			else if (name.Contains("Hurt"))
 			{
 				while (anim.HurtBoxPerFrame.Count <= frame)
 				{
-					anim.HurtBoxPerFrame.Add(new List<HitOrHurtBox>());
+					anim.HurtBoxPerFrame.Add(new List<AnimationInformationBox>());
 				}
-
+				
 				if (anim.HurtBoxPerFrame.Count > frame)
 				{
 					if (anim.HurtBoxPerFrame[frame] == null)
 					{
-						anim.HurtBoxPerFrame[frame] = new List<HitOrHurtBox>();
+						anim.HurtBoxPerFrame[frame] = new List<AnimationInformationBox>();
 					}
 
-					newHitOrHurtBox.Name = "Hurt " + anim.HurtBoxPerFrame[frame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
-					anim.HurtBoxPerFrame[frame].Add(newHitOrHurtBox);
+					newAnimationInformationBox.Name = "Hurt " + anim.HurtBoxPerFrame[frame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
+					anim.HurtBoxPerFrame[frame].Add(newAnimationInformationBox);
+				}
+			}
+			else if (name.Contains("Projectile Spawn"))
+			{
+				while (anim.ProjectileSpawnBoxPerFrame.Count <= frame)
+				{
+					anim.ProjectileSpawnBoxPerFrame.Add(new List<AnimationInformationBox>());
+				}
+				
+				if (anim.ProjectileSpawnBoxPerFrame.Count > frame)
+				{
+					if (anim.ProjectileSpawnBoxPerFrame[frame] == null)
+					{
+						anim.ProjectileSpawnBoxPerFrame[frame] = new List<AnimationInformationBox>();
+					}
+
+					newAnimationInformationBox.Name = "Projectile Spawn " + anim.ProjectileSpawnBoxPerFrame[frame].Where(x => x.Name.Contains("Projectile Spawn")).ToList().Count.ToString();
+					anim.ProjectileSpawnBoxPerFrame[frame].Add(newAnimationInformationBox);
 				}
 			}
 
 			ListBoxItem newListBoxItem = new ListBoxItem();
-			newListBoxItem.Content = newHitOrHurtBox.Name;
-			newListBoxItem.Selected += OnHitOrHurtBoxSelected;
-			newListBoxItem.Unselected += OnHitOrHurtBoxUnselected;
+			newListBoxItem.Content = newAnimationInformationBox.Name;
+			newListBoxItem.Selected += OnAnimationInformationBoxSelected;
+			newListBoxItem.Unselected += OnAnimationInformationBoxUnselected;
 
 			if (addHitBoxToCurrentListBox)
 			{
-				ListOfHurtAndHitBoxes.Items.Add(newListBoxItem);
+				ListOfAnimationInformationBoxes.Items.Add(newListBoxItem);
 			}
 
-			//anim.HitOrHurtBoxListItems.Add(newListBoxItem);
-			while (anim.HitOrHurtBoxListItems.Count <= frame)
+			//anim.AnimationInformationBoxListItems.Add(newListBoxItem);
+			while (anim.AnimationInformationBoxListItems.Count <= frame)
 			{
-				anim.HitOrHurtBoxListItems.Add(new List<ListBoxItem>());
+				anim.AnimationInformationBoxListItems.Add(new List<ListBoxItem>());
 			}
 
-			if (anim.HitOrHurtBoxListItems.Count > frame)
+			if (anim.AnimationInformationBoxListItems.Count > frame)
 			{
-				if (anim.HitOrHurtBoxListItems[frame] == null)
+				if (anim.AnimationInformationBoxListItems[frame] == null)
 				{
-					anim.HitOrHurtBoxListItems[frame] = new List<ListBoxItem>();
+					anim.AnimationInformationBoxListItems[frame] = new List<ListBoxItem>();
 				}
 
-				//newHitOrHurtBox.Name = "Hurt " + anim.HitOrHurtBoxListItems[frame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
-				anim.HitOrHurtBoxListItems[frame].Add(newListBoxItem);
+				//newHitOrHurtBox.Name = "Hurt " + anim.AnimationInformationBoxListItems[frame].Where(x => x.Name.Contains("Hurt")).ToList().Count.ToString();
+				anim.AnimationInformationBoxListItems[frame].Add(newListBoxItem);
 			}
 		}
 
-		private void SavePreviouslySelectedHitOrHurtBoxValues()
+		private void SavepreviouslySelectedAnimationInformationBoxValues()
 		{
-			if (previouslySelectedHitOrHurtBox != null)
+			if (previouslySelectedAnimationInformationBox != null)
 			{
 				int result = 0;
 
 				if (int.TryParse(xTextBox.Text, out result))
 				{
-					previouslySelectedHitOrHurtBox.Box.X = result;
+					previouslySelectedAnimationInformationBox.Box.X = result;
 				}
 
 				if (int.TryParse(yTextBox.Text, out result))
 				{
-					previouslySelectedHitOrHurtBox.Box.Y = result;
+					previouslySelectedAnimationInformationBox.Box.Y = result;
 				}
 
 				if (int.TryParse(wTextBox.Text, out result))
 				{
-					previouslySelectedHitOrHurtBox.Box.Width = result;
+					previouslySelectedAnimationInformationBox.Box.Width = result;
 				}
 
 				if (int.TryParse(hTextBox.Text, out result))
 				{
-					previouslySelectedHitOrHurtBox.Box.Height = result;
+					previouslySelectedAnimationInformationBox.Box.Height = result;
 				}
 
 				if (int.TryParse(DamageTextBox.Text, out result))
 				{
-					previouslySelectedHitOrHurtBox.Damage = result;
+					previouslySelectedAnimationInformationBox.Damage = result;
 				}
 
 				if (int.TryParse(KnockBackXTextBox.Text, out result))
 				{
-					previouslySelectedHitOrHurtBox.KnockBackX = result;
+					previouslySelectedAnimationInformationBox.KnockBackX = result;
 				}
 
 				if (int.TryParse(KnockBackYTextBox.Text, out result))
 				{
-					previouslySelectedHitOrHurtBox.KnockBackY = result;
+					previouslySelectedAnimationInformationBox.KnockBackY = result;
+				}
+
+				if (int.TryParse(ProjectileSpeedXTextBox.Text, out result))
+				{
+					previouslySelectedAnimationInformationBox.ProjectileSpeedX = result;
+				}
+
+				if (int.TryParse(ProjectileSpeedYTextBox.Text, out result))
+				{
+					previouslySelectedAnimationInformationBox.ProjectileSpeedY = result;
 				}
 			}
 		}
 
-		private void OnHitOrHurtBoxSelected(object sender, RoutedEventArgs e)
+		private void OnAnimationInformationBoxSelected(object sender, RoutedEventArgs e)
 		{
-			SavePreviouslySelectedHitOrHurtBoxValues();
+			SavepreviouslySelectedAnimationInformationBoxValues();
 
 			ListBoxItem item = (ListBoxItem)sender;
 
@@ -1182,7 +1174,7 @@ namespace UnitEditor
 			string selectedAnimationName = selectedAnimationItem.Content.ToString();
 			StateAnimation selectedAnimation = GetCurrentStateAnimation(selectedAnimationName);
 
-			List<List<HitOrHurtBox>> listOfBoxes = null;
+			List<List<AnimationInformationBox>> listOfBoxes = null;
 
 			if (item.Content.ToString().Contains("Hit"))
 			{
@@ -1191,19 +1183,33 @@ namespace UnitEditor
 				DamageTextBox.IsEnabled = true;
 				KnockBackXTextBox.IsEnabled = true;
 				KnockBackYTextBox.IsEnabled = true;
+				ProjectileSpeedXTextBox.IsEnabled = true;
+				ProjectileSpeedYTextBox.IsEnabled = true;
 			}
-			else
+			else if (item.Content.ToString().Contains("Hurt"))
 			{
 				listOfBoxes = selectedAnimation.HurtBoxPerFrame;
 
 				DamageTextBox.IsEnabled = false;
 				KnockBackXTextBox.IsEnabled = false;
 				KnockBackYTextBox.IsEnabled = false;
+				ProjectileSpeedXTextBox.IsEnabled = false;
+				ProjectileSpeedYTextBox.IsEnabled = false;
+			}
+			else if (item.Content.ToString().Contains("Projectile Spawn"))
+			{
+				listOfBoxes = selectedAnimation.ProjectileSpawnBoxPerFrame;
+
+				DamageTextBox.IsEnabled = false;
+				KnockBackXTextBox.IsEnabled = false;
+				KnockBackYTextBox.IsEnabled = false;
+				ProjectileSpeedXTextBox.IsEnabled = false;
+				ProjectileSpeedYTextBox.IsEnabled = false;
 			}
 
 			for (int i = 0; i < listOfBoxes[CurrentFrame].Count; i++)
 			{
-				HitOrHurtBox box = listOfBoxes[CurrentFrame][i];
+				AnimationInformationBox box = listOfBoxes[CurrentFrame][i];
 
 				if (box.Name == item.Content.ToString())
 				{
@@ -1214,20 +1220,22 @@ namespace UnitEditor
 					DamageTextBox.Text = box.Damage.ToString();
 					KnockBackXTextBox.Text = box.KnockBackX.ToString();
 					KnockBackYTextBox.Text = box.KnockBackY.ToString();
+					ProjectileSpeedXTextBox.Text = box.ProjectileSpeedX.ToString();
+					ProjectileSpeedYTextBox.Text = box.ProjectileSpeedY.ToString();
 
 					break;
 				}
 			}
 		}
 
-		private void OnHitOrHurtBoxUnselected(object sender, RoutedEventArgs e)
+		private void OnAnimationInformationBoxUnselected(object sender, RoutedEventArgs e)
 		{
 		}
 
 		private void Save(object sender, RoutedEventArgs e)
 		{
 			SavePreviouslySelectedAnimationsInformation(previouslySelectedAnimationsName);
-			SavePreviouslySelectedHitOrHurtBoxValues();
+			SavepreviouslySelectedAnimationInformationBoxValues();
 
 			MyBestiary.BestiaryName = BestiaryNameLabel.Content.ToString();
 			string jsonStr = JsonConvert.SerializeObject(MyBestiary);
@@ -1307,21 +1315,21 @@ namespace UnitEditor
 					//item.IsSelected = true;
 					ListOfUnits.Items.Add(item);
 
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.IdleAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.WalkingAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.RunningAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.DyingAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.DeadAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.AttackingAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.BlockingAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.HitStunAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.JumpingAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.JumpApexAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.FallingAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.LandingAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.TalkingAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.ProjectileActiveAnimations);
-					AddListBoxItemsForThisAnimationsHitAndHurtBoxes(unit.ProjectileHitAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.IdleAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.WalkingAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.RunningAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.DyingAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.DeadAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.AttackingAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.BlockingAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.HitStunAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.JumpingAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.JumpApexAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.FallingAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.LandingAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.TalkingAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.ProjectileActiveAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.ProjectileHitAnimations);
 				}
 
 				FrameCanvas.Children.Clear();
@@ -1330,7 +1338,7 @@ namespace UnitEditor
 			}
 		}
 
-		void AddListBoxItemsForThisAnimationsHitAndHurtBoxes(List<StateAnimation> anims)
+		void AddListBoxItemsForThisAnimationsAnimationInformationBoxes(List<StateAnimation> anims)
 		{
 			for (int i = 0; i < anims.Count; i++)
 			{
@@ -1338,7 +1346,7 @@ namespace UnitEditor
 				{
 					for (int k = 0; k < anims[i].HitBoxPerFrame[j].Count; k++)
 					{
-						AddListBoxItemsForThisAnimationsHitOrHurtBoxes(anims, i, j, k, true);
+						AddListBoxItemsForThisAnimationsAnimationInformationBoxes(anims, i, j, k, "Hit");
 					}
 				}
 
@@ -1346,40 +1354,52 @@ namespace UnitEditor
 				{
 					for (int k = 0; k < anims[i].HurtBoxPerFrame[j].Count; k++)
 					{
-						AddListBoxItemsForThisAnimationsHitOrHurtBoxes(anims, i, j, k, false);
+						AddListBoxItemsForThisAnimationsAnimationInformationBoxes(anims, i, j, k, "Hurt");
+					}
+				}
+
+				for (int j = 0; j < anims[i].ProjectileSpawnBoxPerFrame.Count; j++)
+				{
+					for (int k = 0; k < anims[i].ProjectileSpawnBoxPerFrame[j].Count; k++)
+					{
+						AddListBoxItemsForThisAnimationsAnimationInformationBoxes(anims, i, j, k, "Projectile Spawn");
 					}
 				}
 			}
 		}
 
-		void AddListBoxItemsForThisAnimationsHitOrHurtBoxes(List<StateAnimation> anims, int i, int j, int k, bool hitBoxes)
+		void AddListBoxItemsForThisAnimationsAnimationInformationBoxes(List<StateAnimation> anims, int i, int j, int k, string box_type)
 		{
 			ListBoxItem newListBoxItem = new ListBoxItem();
-			if (hitBoxes)
+			if (box_type.Contains("Hit"))
 			{
 				newListBoxItem.Content = anims[i].HitBoxPerFrame[j][k].Name;
 			}
-			else
+			else if(box_type.Contains("Hurt"))
 			{
 				newListBoxItem.Content = anims[i].HurtBoxPerFrame[j][k].Name;
 			}
-			newListBoxItem.Selected += OnHitOrHurtBoxSelected;
-			newListBoxItem.Unselected += OnHitOrHurtBoxUnselected;
-			ListOfHurtAndHitBoxes.Items.Add(newListBoxItem);
-
-			while (anims[i].HitOrHurtBoxListItems.Count <= j)
+			else if (box_type.Contains("Projectile Spawn"))
 			{
-				anims[i].HitOrHurtBoxListItems.Add(new List<ListBoxItem>());
+				newListBoxItem.Content = anims[i].ProjectileSpawnBoxPerFrame[j][k].Name;
+			}
+			newListBoxItem.Selected += OnAnimationInformationBoxSelected;
+			newListBoxItem.Unselected += OnAnimationInformationBoxUnselected;
+			ListOfAnimationInformationBoxes.Items.Add(newListBoxItem);
+
+			while (anims[i].AnimationInformationBoxListItems.Count <= j)
+			{
+				anims[i].AnimationInformationBoxListItems.Add(new List<ListBoxItem>());
 			}
 
-			if (anims[i].HitOrHurtBoxListItems.Count > j)
+			if (anims[i].AnimationInformationBoxListItems.Count > j)
 			{
-				if (anims[i].HitOrHurtBoxListItems[j] == null)
+				if (anims[i].AnimationInformationBoxListItems[j] == null)
 				{
-					anims[i].HitOrHurtBoxListItems[j] = new List<ListBoxItem>();
+					anims[i].AnimationInformationBoxListItems[j] = new List<ListBoxItem>();
 				}
 
-				anims[i].HitOrHurtBoxListItems[j].Add(newListBoxItem);
+				anims[i].AnimationInformationBoxListItems[j].Add(newListBoxItem);
 			}
 		}
 
@@ -1663,16 +1683,6 @@ namespace UnitEditor
 			unitsStateAnimationList.Add(stateAnimation);
 		}
 
-		private void HitBoxCheckBox_Checked(object sender, RoutedEventArgs e)
-		{
-			HurtBoxCheckBox.IsChecked = false;
-		}
-
-		private void HurtBoxCheckBox_Checked(object sender, RoutedEventArgs e)
-		{
-			HitBoxCheckBox.IsChecked = false;
-		}
-
 		private void DeleteAnimationButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (ListOfStateAnimations.SelectedItem != null)
@@ -1714,12 +1724,12 @@ namespace UnitEditor
 			}
 		}
 
-		private void DeleteHitOrHurtBoxButton_Click(object sender, RoutedEventArgs e)
+		private void DeleteAnimationInformationBoxButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (ListOfHurtAndHitBoxes.SelectedItem != null)
+			if (ListOfAnimationInformationBoxes.SelectedItem != null)
 			{
-				string sCaption = "Delete Hit/Hurt Box";
-				string sMessageBoxText = "This will delete the currently selected\nhit/hurt box and cannot be undone.\n\nDo you wish to continue?";
+				string sCaption = "Delete Animation Information Box";
+				string sMessageBoxText = "This will delete the currently selected\nanimation information box and cannot be undone.\n\nDo you wish to continue?";
 
 				MessageBoxButton btnMessageBox = MessageBoxButton.YesNoCancel;
 				MessageBoxImage icnMessageBox = MessageBoxImage.Warning;
@@ -1733,76 +1743,113 @@ namespace UnitEditor
 						string selectedAnimationName = selectedAnimationItem.Content.ToString();
 						StateAnimation selectedAnimation = GetCurrentStateAnimation(selectedAnimationName);
 
-						ListBoxItem selectedHitOrHurtBoxItem = (ListBoxItem)ListOfHurtAndHitBoxes.SelectedItem;
-						string selectedHitOrHurtBoxName = selectedHitOrHurtBoxItem.Content.ToString();
+						ListBoxItem selectedAnimationInformationBoxItem = (ListBoxItem)ListOfAnimationInformationBoxes.SelectedItem;
+						string selectedAnimationInformationBoxName = selectedAnimationInformationBoxItem.Content.ToString();
 
 						bool breakOutOfForLoops = false;
 
-						if (selectedHitOrHurtBoxName.Contains("Hit"))
+						if (selectedAnimationInformationBoxName.Contains("Hit"))
 						{
-							for (int i = 0; i < selectedAnimation.HitBoxPerFrame.Count; i++)
+							if (selectedAnimation.HitBoxPerFrame.Count > CurrentFrame)
 							{
-								for (int box = 0; box < selectedAnimation.HitBoxPerFrame[i].Count; box++)
+								for (int box = 0; box < selectedAnimation.HitBoxPerFrame[CurrentFrame].Count; box++)
 								{
-									if (selectedHitOrHurtBoxName == selectedAnimation.HitBoxPerFrame[i][box].Name)
+									if (selectedAnimationInformationBoxName == selectedAnimation.HitBoxPerFrame[CurrentFrame][box].Name)
 									{
-										FrameCanvas.Children.Remove(selectedAnimation.HitBoxPerFrame[i][box].DrawRectangle);
-										selectedAnimation.HitBoxPerFrame[i][box].DrawRectangle = null;
-										selectedAnimation.HitBoxPerFrame[i].RemoveAt(box);
+										FrameCanvas.Children.Remove(selectedAnimation.HitBoxPerFrame[CurrentFrame][box].DrawRectangle);
+										selectedAnimation.HitBoxPerFrame[CurrentFrame][box].DrawRectangle = null;
+										selectedAnimation.HitBoxPerFrame[CurrentFrame].RemoveAt(box);
 										breakOutOfForLoops = true;
 										break;
 									}
-								}
-
-								if (breakOutOfForLoops)
-								{
-									break;
 								}
 							}
 						}
-						else // Hurt
+						else if (selectedAnimationInformationBoxName.Contains("Hurt"))
 						{
-							for (int i = 0; i < selectedAnimation.HurtBoxPerFrame.Count; i++)
+							if (selectedAnimation.HurtBoxPerFrame.Count > CurrentFrame)
 							{
-								for (int box = 0; box < selectedAnimation.HurtBoxPerFrame[i].Count; box++)
+								for (int box = 0; box < selectedAnimation.HurtBoxPerFrame[CurrentFrame].Count; box++)
 								{
-									if (selectedHitOrHurtBoxName == selectedAnimation.HurtBoxPerFrame[i][box].Name)
+									if (selectedAnimationInformationBoxName == selectedAnimation.HurtBoxPerFrame[CurrentFrame][box].Name)
 									{
-										FrameCanvas.Children.Remove(selectedAnimation.HurtBoxPerFrame[i][box].DrawRectangle);
-										selectedAnimation.HurtBoxPerFrame[i][box].DrawRectangle = null;
-										selectedAnimation.HurtBoxPerFrame[i].RemoveAt(box);
+										FrameCanvas.Children.Remove(selectedAnimation.HurtBoxPerFrame[CurrentFrame][box].DrawRectangle);
+										selectedAnimation.HurtBoxPerFrame[CurrentFrame][box].DrawRectangle = null;
+										selectedAnimation.HurtBoxPerFrame[CurrentFrame].RemoveAt(box);
 										breakOutOfForLoops = true;
 										break;
 									}
 								}
-
-								if (breakOutOfForLoops)
+							}
+						}
+						else if (selectedAnimationInformationBoxName.Contains("Projectile Spawn"))
+						{
+							if (selectedAnimation.ProjectileSpawnBoxPerFrame.Count > CurrentFrame)
+							{
+								for (int box = 0; box < selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame].Count; box++)
 								{
-									break;
+									if (selectedAnimationInformationBoxName == selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame][box].Name)
+									{
+										FrameCanvas.Children.Remove(selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame][box].DrawRectangle);
+										selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame][box].DrawRectangle = null;
+										selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame].RemoveAt(box);
+										breakOutOfForLoops = true;
+										break;
+									}
 								}
 							}
 						}
 
 						breakOutOfForLoops = false;
-						for (int i = 0; i < selectedAnimation.HitOrHurtBoxListItems.Count; i++)
+						if (selectedAnimation.AnimationInformationBoxListItems.Count > CurrentFrame)
 						{
-							for (int box = 0; box < selectedAnimation.HitOrHurtBoxListItems[i].Count; box++)
+							for (int box = 0; box < selectedAnimation.AnimationInformationBoxListItems[CurrentFrame].Count; box++)
 							{
-								if (selectedHitOrHurtBoxName == selectedAnimation.HitOrHurtBoxListItems[i][box].Content.ToString())
+								if (selectedAnimationInformationBoxName == selectedAnimation.AnimationInformationBoxListItems[CurrentFrame][box].Content.ToString())
 								{
-									selectedAnimation.HitOrHurtBoxListItems[i].RemoveAt(box);
+									selectedAnimation.AnimationInformationBoxListItems[CurrentFrame].RemoveAt(box);
 									breakOutOfForLoops = true;
 									break;
 								}
 							}
-
-							if (breakOutOfForLoops)
-							{
-								break;
-							}
 						}
 
-						ListOfHurtAndHitBoxes.Items.Remove(selectedHitOrHurtBoxItem);
+						ListOfAnimationInformationBoxes.Items.Remove(selectedAnimationInformationBoxItem);
+						
+						//FrameCanvas.Children.Clear();
+						//
+						//if (selectedAnimation.HitBoxPerFrame.Count > CurrentFrame)
+						//{
+						//	for (int box = 0; box < selectedAnimation.HitBoxPerFrame[CurrentFrame].Count; box++)
+						//	{
+						//		if (selectedAnimationInformationBoxName == selectedAnimation.HitBoxPerFrame[CurrentFrame][box].Name)
+						//		{
+						//			FrameCanvas.Children.Add(selectedAnimation.HitBoxPerFrame[CurrentFrame][box].DrawRectangle);
+						//		}
+						//	}
+						//}
+						//
+						//if (selectedAnimation.HurtBoxPerFrame.Count > CurrentFrame)
+						//{
+						//	for (int box = 0; box < selectedAnimation.HurtBoxPerFrame[CurrentFrame].Count; box++)
+						//	{
+						//		if (selectedAnimationInformationBoxName == selectedAnimation.HurtBoxPerFrame[CurrentFrame][box].Name)
+						//		{
+						//			FrameCanvas.Children.Add(selectedAnimation.HurtBoxPerFrame[CurrentFrame][box].DrawRectangle);
+						//		}
+						//	}
+						//}
+						//
+						//if (selectedAnimation.ProjectileSpawnBoxPerFrame.Count > CurrentFrame)
+						//{
+						//	for (int box = 0; box < selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame].Count; box++)
+						//	{
+						//		if (selectedAnimationInformationBoxName == selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame][box].Name)
+						//		{
+						//			FrameCanvas.Children.Add(selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame][box].DrawRectangle);
+						//		}
+						//	}
+						//}
 
 						break;
 					case MessageBoxResult.No:
@@ -1815,7 +1862,7 @@ namespace UnitEditor
 
 		private void CopyBoxToNextFrameButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (ListOfHurtAndHitBoxes.SelectedItem != null)
+			if (ListOfAnimationInformationBoxes.SelectedItem != null)
 			{
 				ListBoxItem selectedAnimationItem = (ListBoxItem)ListOfStateAnimations.SelectedItem;
 				string selectedAnimationName = selectedAnimationItem.Content.ToString();
@@ -1823,38 +1870,43 @@ namespace UnitEditor
 
 				if (CurrentFrame + 1 < selectedAnimation.NumberOfFrames)
 				{
-					ListBoxItem selectedHitOrHurtBoxItem = (ListBoxItem)ListOfHurtAndHitBoxes.SelectedItem;
-					string selectedHitOrHurtBoxName = selectedHitOrHurtBoxItem.Content.ToString();
-					HitOrHurtBox origHitOrHurtBox;
-					bool isHitBox = selectedHitOrHurtBoxName.Contains("Hit");
+					ListBoxItem selectedAnimationInformationBoxItem = (ListBoxItem)ListOfAnimationInformationBoxes.SelectedItem;
+					string selectedAnimationInformationBoxName = selectedAnimationInformationBoxItem.Content.ToString();
+					AnimationInformationBox origAnimationInformationBox = new AnimationInformationBox();
 
-					if (isHitBox)
+					if (selectedAnimationInformationBoxName.Contains("Hit"))
 					{
-						origHitOrHurtBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+						origAnimationInformationBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
 					}
-					else
+					else if (selectedAnimationInformationBoxName.Contains("Hurt"))
 					{
-						origHitOrHurtBox = selectedAnimation.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+						origAnimationInformationBox = selectedAnimation.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
+					}
+					else if (selectedAnimationInformationBoxName.Contains("Projectile Spawn"))
+					{
+						origAnimationInformationBox = selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
 					}
 
-					if (origHitOrHurtBox != null)
+					if (origAnimationInformationBox != null)
 					{
-						HitOrHurtBox newHitOrHurtBox = new HitOrHurtBox();
-						newHitOrHurtBox.Box.X = origHitOrHurtBox.Box.X;
-						newHitOrHurtBox.Box.Y = origHitOrHurtBox.Box.Y;
-						newHitOrHurtBox.Box.Width = origHitOrHurtBox.Box.Width;
-						newHitOrHurtBox.Box.Height = origHitOrHurtBox.Box.Height;
-						newHitOrHurtBox.DrawRect.X = origHitOrHurtBox.DrawRect.X;
-						newHitOrHurtBox.DrawRect.Y = origHitOrHurtBox.DrawRect.Y;
-						newHitOrHurtBox.DrawRect.Width = origHitOrHurtBox.DrawRect.Width;
-						newHitOrHurtBox.DrawRect.Height = origHitOrHurtBox.DrawRect.Height;
-						newHitOrHurtBox.DrawRectangle = origHitOrHurtBox.DrawRectangle;
-						newHitOrHurtBox.Damage = origHitOrHurtBox.Damage;
-						newHitOrHurtBox.KnockBackX = origHitOrHurtBox.KnockBackX;
-						newHitOrHurtBox.KnockBackY = origHitOrHurtBox.KnockBackY;
-						newHitOrHurtBox.Frame = CurrentFrame + 1;
+						AnimationInformationBox newAnimationInformationBox = new AnimationInformationBox();
+						newAnimationInformationBox.Box.X = origAnimationInformationBox.Box.X;
+						newAnimationInformationBox.Box.Y = origAnimationInformationBox.Box.Y;
+						newAnimationInformationBox.Box.Width = origAnimationInformationBox.Box.Width;
+						newAnimationInformationBox.Box.Height = origAnimationInformationBox.Box.Height;
+						newAnimationInformationBox.DrawRect.X = origAnimationInformationBox.DrawRect.X;
+						newAnimationInformationBox.DrawRect.Y = origAnimationInformationBox.DrawRect.Y;
+						newAnimationInformationBox.DrawRect.Width = origAnimationInformationBox.DrawRect.Width;
+						newAnimationInformationBox.DrawRect.Height = origAnimationInformationBox.DrawRect.Height;
+						newAnimationInformationBox.DrawRectangle = origAnimationInformationBox.DrawRectangle;
+						newAnimationInformationBox.Damage = origAnimationInformationBox.Damage;
+						newAnimationInformationBox.KnockBackX = origAnimationInformationBox.KnockBackX;
+						newAnimationInformationBox.KnockBackY = origAnimationInformationBox.KnockBackY;
+						newAnimationInformationBox.ProjectileSpeedX = origAnimationInformationBox.ProjectileSpeedX;
+						newAnimationInformationBox.ProjectileSpeedY = origAnimationInformationBox.ProjectileSpeedY;
+						newAnimationInformationBox.Frame = CurrentFrame + 1;
 
-						AddNewHitOrHurtBox(selectedAnimation, newHitOrHurtBox, CurrentFrame + 1, isHitBox, false);
+						AddNewAnimationInformationBox(selectedAnimation, newAnimationInformationBox, CurrentFrame + 1, selectedAnimationInformationBoxName, false);
 					}
 				}
 			}
@@ -2067,52 +2119,81 @@ namespace UnitEditor
 
 		private void CopyBoxToEveryFrameButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (ListOfHurtAndHitBoxes.SelectedItem != null)
+			if (ListOfAnimationInformationBoxes.SelectedItem != null)
 			{
 				ListBoxItem selectedAnimationItem = (ListBoxItem)ListOfStateAnimations.SelectedItem;
 				string selectedAnimationName = selectedAnimationItem.Content.ToString();
 				StateAnimation selectedAnimation = GetCurrentStateAnimation(selectedAnimationName);
 				
-				ListBoxItem selectedHitOrHurtBoxItem = (ListBoxItem)ListOfHurtAndHitBoxes.SelectedItem;
-				string selectedHitOrHurtBoxName = selectedHitOrHurtBoxItem.Content.ToString();
-				HitOrHurtBox origHitOrHurtBox;
-				bool isHitBox = selectedHitOrHurtBoxName.Contains("Hit");
+				ListBoxItem selectedAnimationInformationBoxItem = (ListBoxItem)ListOfAnimationInformationBoxes.SelectedItem;
+				string selectedAnimationInformationBoxName = selectedAnimationInformationBoxItem.Content.ToString();
+				AnimationInformationBox origAnimationInformationBox = new AnimationInformationBox();
 
-				if (isHitBox)
+				if (selectedAnimationInformationBoxName.Contains("Hit"))
 				{
-					origHitOrHurtBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+					origAnimationInformationBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
 				}
-				else
+				else if (selectedAnimationInformationBoxName.Contains("Hurt"))
 				{
-					origHitOrHurtBox = selectedAnimation.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedHitOrHurtBoxName).First();
+					origAnimationInformationBox = selectedAnimation.HurtBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
+				}
+				else if (selectedAnimationInformationBoxName.Contains("Projectile Spawn"))
+				{
+					origAnimationInformationBox = selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
 				}
 
-				if (origHitOrHurtBox != null)
+				if (origAnimationInformationBox != null)
 				{
 					for (int i = 0; i < NumberOfFrames; i++)
 					{
 						if (i != CurrentFrame)
 						{
-							HitOrHurtBox newHitOrHurtBox = new HitOrHurtBox();
-							newHitOrHurtBox.Box.X = origHitOrHurtBox.Box.X;
-							newHitOrHurtBox.Box.Y = origHitOrHurtBox.Box.Y;
-							newHitOrHurtBox.Box.Width = origHitOrHurtBox.Box.Width;
-							newHitOrHurtBox.Box.Height = origHitOrHurtBox.Box.Height;
-							newHitOrHurtBox.DrawRect.X = origHitOrHurtBox.DrawRect.X;
-							newHitOrHurtBox.DrawRect.Y = origHitOrHurtBox.DrawRect.Y;
-							newHitOrHurtBox.DrawRect.Width = origHitOrHurtBox.DrawRect.Width;
-							newHitOrHurtBox.DrawRect.Height = origHitOrHurtBox.DrawRect.Height;
-							newHitOrHurtBox.DrawRectangle = origHitOrHurtBox.DrawRectangle;
-							newHitOrHurtBox.Damage = origHitOrHurtBox.Damage;
-							newHitOrHurtBox.KnockBackX = origHitOrHurtBox.KnockBackX;
-							newHitOrHurtBox.KnockBackY = origHitOrHurtBox.KnockBackY;
-							newHitOrHurtBox.Frame = i;
+							AnimationInformationBox newAnimationInformationBox = new AnimationInformationBox();
+							newAnimationInformationBox.Box.X = origAnimationInformationBox.Box.X;
+							newAnimationInformationBox.Box.Y = origAnimationInformationBox.Box.Y;
+							newAnimationInformationBox.Box.Width = origAnimationInformationBox.Box.Width;
+							newAnimationInformationBox.Box.Height = origAnimationInformationBox.Box.Height;
+							newAnimationInformationBox.DrawRect.X = origAnimationInformationBox.DrawRect.X;
+							newAnimationInformationBox.DrawRect.Y = origAnimationInformationBox.DrawRect.Y;
+							newAnimationInformationBox.DrawRect.Width = origAnimationInformationBox.DrawRect.Width;
+							newAnimationInformationBox.DrawRect.Height = origAnimationInformationBox.DrawRect.Height;
+							newAnimationInformationBox.DrawRectangle = origAnimationInformationBox.DrawRectangle;
+							newAnimationInformationBox.Damage = origAnimationInformationBox.Damage;
+							newAnimationInformationBox.KnockBackX = origAnimationInformationBox.KnockBackX;
+							newAnimationInformationBox.KnockBackY = origAnimationInformationBox.KnockBackY;
+							newAnimationInformationBox.ProjectileSpeedX = origAnimationInformationBox.ProjectileSpeedX;
+							newAnimationInformationBox.ProjectileSpeedY = origAnimationInformationBox.ProjectileSpeedY;
+							newAnimationInformationBox.Frame = i;
 
-							AddNewHitOrHurtBox(selectedAnimation, newHitOrHurtBox, i, isHitBox, false);
+							AddNewAnimationInformationBox(selectedAnimation, newAnimationInformationBox, i, selectedAnimationInformationBoxName, false);
 						}
 					}
 				}
 			}
+		}
+
+		private void HitBoxCheckBox_Checked(object sender, RoutedEventArgs e)
+		{
+			if (HurtBoxCheckBox != null && HurtBoxCheckBox.IsChecked != null)
+				HurtBoxCheckBox.IsChecked = false;
+			if (ProjectileSpawnCheckBox != null && ProjectileSpawnCheckBox.IsChecked != null)
+				ProjectileSpawnCheckBox.IsChecked = false;
+		}
+
+		private void ProjectileSpawnCheckBox_Checked(object sender, RoutedEventArgs e)
+		{
+			if (HurtBoxCheckBox != null && HurtBoxCheckBox.IsChecked != null)
+				HurtBoxCheckBox.IsChecked = false;
+			if (HitBoxCheckBox != null && HitBoxCheckBox.IsChecked != null)
+				HitBoxCheckBox.IsChecked = false;
+		}
+
+		private void HurtBoxCheckBox_Checked(object sender, RoutedEventArgs e)
+		{
+			if (HitBoxCheckBox != null && HitBoxCheckBox.IsChecked != null)
+				HitBoxCheckBox.IsChecked = false;
+			if (ProjectileSpawnCheckBox != null && ProjectileSpawnCheckBox.IsChecked != null)
+				ProjectileSpawnCheckBox.IsChecked = false;
 		}
 	}
 
@@ -2175,17 +2256,18 @@ namespace UnitEditor
 		public List<string> LeftFootSoundFilePerFrame = new List<string>();
 		public List<string> ThrowProjectileSoundFilePerFrame = new List<string>();
 		public List<string> ProjectileHitSoundFilePerFrame = new List<string>();
-		public List<List<HitOrHurtBox>> HurtBoxPerFrame = new List<List<HitOrHurtBox>>();
-		public List<List<HitOrHurtBox>> HitBoxPerFrame = new List<List<HitOrHurtBox>>();
+		public List<List<AnimationInformationBox>> HurtBoxPerFrame = new List<List<AnimationInformationBox>>();
+		public List<List<AnimationInformationBox>> HitBoxPerFrame = new List<List<AnimationInformationBox>>();
+		public List<List<AnimationInformationBox>> ProjectileSpawnBoxPerFrame = new List<List<AnimationInformationBox>>();
 		[JsonIgnore]
-		public List<List<ListBoxItem>> HitOrHurtBoxListItems = new List<List<ListBoxItem>>();
+		public List<List<ListBoxItem>> AnimationInformationBoxListItems = new List<List<ListBoxItem>>();
 
 		public StateAnimation()
 		{
 		}
 	}
 
-	public class HitOrHurtBox
+	public class AnimationInformationBox
 	{
 		public string Name = "";
 		public Rect Box = new Rect();
@@ -2217,8 +2299,10 @@ namespace UnitEditor
 		public int Damage = 0;
 		public float KnockBackX = 0.0f;
 		public float KnockBackY = 0.0f;
+		public float ProjectileSpeedX = 0.0f;
+		public float ProjectileSpeedY = 0.0f;
 
-		public HitOrHurtBox()
+		public AnimationInformationBox()
 		{
 		}
 	}
