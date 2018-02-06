@@ -112,11 +112,14 @@
 			<TextBox Name="hTextBox" Canvas.Right="5" Canvas.Top="441" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="DamageLabel"  Canvas.Right="80" Canvas.Top="458">Damage:</Label>
 			<TextBox Name="DamageTextBox" Canvas.Right="5" Canvas.Top="462" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
-			<Label Name="KnockBackXLabel"  Canvas.Right="80" Canvas.Top="476">Knock Back X:</Label>
-			<TextBox Name="KnockBackXTextBox" Canvas.Right="5" Canvas.Top="480" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
-			<Label Name="KnockBackYLabel"  Canvas.Right="80" Canvas.Top="494">Knock Back Y:</Label>
-			<TextBox Name="KnockBackYTextBox" Canvas.Right="5" Canvas.Top="498" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
-			
+			<Label Name="KnockBackXLabel"  Canvas.Right="130" Canvas.Top="476">Knock Back X:</Label>
+			<TextBox Name="KnockBackXTextBox" Canvas.Right="80" Canvas.Top="480" Width="50" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
+			<Label Name="KnockBackYLabel"  Canvas.Right="55" Canvas.Top="476">Y:</Label>
+			<TextBox Name="KnockBackYTextBox" Canvas.Right="5" Canvas.Top="480" Width="50" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
+			<Label Name="HitStunFramesLabel"  Canvas.Right="80" Canvas.Top="494">Hit Stun Frames:</Label>
+			<TextBox Name="HitStunFramesTextBox" Canvas.Right="5" Canvas.Top="498" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
+			<CheckBox Name="PopUpCheckBox" Checked="PopUpCheckBox_Checked" Canvas.Right="125" Canvas.Top="780" IsChecked="False">Pop Up Move</CheckBox>
+
 			<Label Name="ProjectileSpeedXLabel"  Canvas.Right="80" Canvas.Top="516">Projectile Speed X:</Label>
 			<TextBox Name="ProjectileSpeedXTextBox" Canvas.Right="5" Canvas.Top="520" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="ProjectileSpeedYLabel"  Canvas.Right="80" Canvas.Top="534">Projectile Speed Y:</Label>

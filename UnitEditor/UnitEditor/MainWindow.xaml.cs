@@ -288,7 +288,7 @@ namespace UnitEditor
 				}
 			}
 
-			if ((DamageTextBox.IsFocused || KnockBackXTextBox.IsFocused || KnockBackYTextBox.IsFocused || ProjectileSpeedXTextBox.IsFocused || ProjectileSpeedYTextBox.IsFocused) && SelectedUnit != null)
+			if ((DamageTextBox.IsFocused || KnockBackXTextBox.IsFocused || KnockBackYTextBox.IsFocused || ProjectileSpeedXTextBox.IsFocused || ProjectileSpeedYTextBox.IsFocused || HitStunFramesTextBox.IsFocused) && SelectedUnit != null)
 			{
 				StateAnimation selectedAnimation = GetCurrentStateAnimation();
 				if (selectedAnimation != null)
@@ -321,6 +321,7 @@ namespace UnitEditor
 								float.TryParse(KnockBackYTextBox.Text, out selectedAnimationInformationBox.KnockBackY);
 								float.TryParse(ProjectileSpeedXTextBox.Text, out selectedAnimationInformationBox.ProjectileSpeedX);
 								float.TryParse(ProjectileSpeedYTextBox.Text, out selectedAnimationInformationBox.ProjectileSpeedY);
+								int.TryParse(HitStunFramesTextBox.Text, out selectedAnimationInformationBox.HitStunFrames);
 							}
 							catch (Exception exception)
 							{
@@ -994,7 +995,9 @@ namespace UnitEditor
 				newAnimationInformationBox.Damage = 0;
 				newAnimationInformationBox.KnockBackX = 0.0f;
 				newAnimationInformationBox.KnockBackY = 0.0f;
+				newAnimationInformationBox.HitStunFrames = 0;
 				newAnimationInformationBox.Frame = CurrentFrame;
+				newAnimationInformationBox.PopUp = false;
 
 				string box_type = "";
 				if (HitBoxCheckBox.IsChecked.HasValue && HitBoxCheckBox.IsChecked.Value)
@@ -1021,6 +1024,8 @@ namespace UnitEditor
 				KnockBackYTextBox.Text = newAnimationInformationBox.KnockBackY.ToString();
 				ProjectileSpeedXTextBox.Text = newAnimationInformationBox.ProjectileSpeedX.ToString();
 				ProjectileSpeedYTextBox.Text = newAnimationInformationBox.ProjectileSpeedY.ToString();
+				HitStunFramesTextBox.Text = newAnimationInformationBox.HitStunFrames.ToString();
+				PopUpCheckBox.IsChecked = newAnimationInformationBox.PopUp;
 
 				rect_getting_drawn = null;
 			}
@@ -1161,6 +1166,13 @@ namespace UnitEditor
 				{
 					previouslySelectedAnimationInformationBox.ProjectileSpeedY = result;
 				}
+
+				if (int.TryParse(HitStunFramesTextBox.Text, out result))
+				{
+					previouslySelectedAnimationInformationBox.HitStunFrames = result;
+				}
+
+				previouslySelectedAnimationInformationBox.PopUp = PopUpCheckBox.IsChecked.HasValue ? PopUpCheckBox.IsChecked.Value : false;
 			}
 		}
 
@@ -1185,6 +1197,8 @@ namespace UnitEditor
 				KnockBackYTextBox.IsEnabled = true;
 				ProjectileSpeedXTextBox.IsEnabled = true;
 				ProjectileSpeedYTextBox.IsEnabled = true;
+				HitStunFramesTextBox.IsEnabled = true;
+				PopUpCheckBox.IsEnabled = true;
 			}
 			else if (item.Content.ToString().Contains("Hurt"))
 			{
@@ -1195,6 +1209,8 @@ namespace UnitEditor
 				KnockBackYTextBox.IsEnabled = false;
 				ProjectileSpeedXTextBox.IsEnabled = false;
 				ProjectileSpeedYTextBox.IsEnabled = false;
+				HitStunFramesTextBox.IsEnabled = false;
+				PopUpCheckBox.IsEnabled = false;
 			}
 			else if (item.Content.ToString().Contains("Projectile Spawn"))
 			{
@@ -1205,6 +1221,8 @@ namespace UnitEditor
 				KnockBackYTextBox.IsEnabled = false;
 				ProjectileSpeedXTextBox.IsEnabled = false;
 				ProjectileSpeedYTextBox.IsEnabled = false;
+				HitStunFramesTextBox.IsEnabled = false;
+				PopUpCheckBox.IsEnabled = false;
 			}
 
 			for (int i = 0; i < listOfBoxes[CurrentFrame].Count; i++)
@@ -1222,6 +1240,8 @@ namespace UnitEditor
 					KnockBackYTextBox.Text = box.KnockBackY.ToString();
 					ProjectileSpeedXTextBox.Text = box.ProjectileSpeedX.ToString();
 					ProjectileSpeedYTextBox.Text = box.ProjectileSpeedY.ToString();
+					HitStunFramesTextBox.Text = box.HitStunFrames.ToString();
+					PopUpCheckBox.IsChecked = box.PopUp;
 
 					break;
 				}
@@ -1746,8 +1766,6 @@ namespace UnitEditor
 						ListBoxItem selectedAnimationInformationBoxItem = (ListBoxItem)ListOfAnimationInformationBoxes.SelectedItem;
 						string selectedAnimationInformationBoxName = selectedAnimationInformationBoxItem.Content.ToString();
 
-						bool breakOutOfForLoops = false;
-
 						if (selectedAnimationInformationBoxName.Contains("Hit"))
 						{
 							if (selectedAnimation.HitBoxPerFrame.Count > CurrentFrame)
@@ -1759,7 +1777,6 @@ namespace UnitEditor
 										FrameCanvas.Children.Remove(selectedAnimation.HitBoxPerFrame[CurrentFrame][box].DrawRectangle);
 										selectedAnimation.HitBoxPerFrame[CurrentFrame][box].DrawRectangle = null;
 										selectedAnimation.HitBoxPerFrame[CurrentFrame].RemoveAt(box);
-										breakOutOfForLoops = true;
 										break;
 									}
 								}
@@ -1776,7 +1793,6 @@ namespace UnitEditor
 										FrameCanvas.Children.Remove(selectedAnimation.HurtBoxPerFrame[CurrentFrame][box].DrawRectangle);
 										selectedAnimation.HurtBoxPerFrame[CurrentFrame][box].DrawRectangle = null;
 										selectedAnimation.HurtBoxPerFrame[CurrentFrame].RemoveAt(box);
-										breakOutOfForLoops = true;
 										break;
 									}
 								}
@@ -1793,14 +1809,12 @@ namespace UnitEditor
 										FrameCanvas.Children.Remove(selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame][box].DrawRectangle);
 										selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame][box].DrawRectangle = null;
 										selectedAnimation.ProjectileSpawnBoxPerFrame[CurrentFrame].RemoveAt(box);
-										breakOutOfForLoops = true;
 										break;
 									}
 								}
 							}
 						}
-
-						breakOutOfForLoops = false;
+						
 						if (selectedAnimation.AnimationInformationBoxListItems.Count > CurrentFrame)
 						{
 							for (int box = 0; box < selectedAnimation.AnimationInformationBoxListItems[CurrentFrame].Count; box++)
@@ -1808,7 +1822,6 @@ namespace UnitEditor
 								if (selectedAnimationInformationBoxName == selectedAnimation.AnimationInformationBoxListItems[CurrentFrame][box].Content.ToString())
 								{
 									selectedAnimation.AnimationInformationBoxListItems[CurrentFrame].RemoveAt(box);
-									breakOutOfForLoops = true;
 									break;
 								}
 							}
@@ -1904,6 +1917,8 @@ namespace UnitEditor
 						newAnimationInformationBox.KnockBackY = origAnimationInformationBox.KnockBackY;
 						newAnimationInformationBox.ProjectileSpeedX = origAnimationInformationBox.ProjectileSpeedX;
 						newAnimationInformationBox.ProjectileSpeedY = origAnimationInformationBox.ProjectileSpeedY;
+						newAnimationInformationBox.HitStunFrames = origAnimationInformationBox.HitStunFrames;
+						newAnimationInformationBox.PopUp = origAnimationInformationBox.PopUp;
 						newAnimationInformationBox.Frame = CurrentFrame + 1;
 
 						AddNewAnimationInformationBox(selectedAnimation, newAnimationInformationBox, CurrentFrame + 1, selectedAnimationInformationBoxName, false);
@@ -2162,7 +2177,9 @@ namespace UnitEditor
 							newAnimationInformationBox.KnockBackX = origAnimationInformationBox.KnockBackX;
 							newAnimationInformationBox.KnockBackY = origAnimationInformationBox.KnockBackY;
 							newAnimationInformationBox.ProjectileSpeedX = origAnimationInformationBox.ProjectileSpeedX;
-							newAnimationInformationBox.ProjectileSpeedY = origAnimationInformationBox.ProjectileSpeedY;
+							newAnimationInformationBox.ProjectileSpeedY = origAnimationInformationBox.ProjectileSpeedY; 
+							newAnimationInformationBox.HitStunFrames = origAnimationInformationBox.HitStunFrames;
+							newAnimationInformationBox.PopUp = origAnimationInformationBox.PopUp;
 							newAnimationInformationBox.Frame = i;
 
 							AddNewAnimationInformationBox(selectedAnimation, newAnimationInformationBox, i, selectedAnimationInformationBoxName, false);
@@ -2194,6 +2211,30 @@ namespace UnitEditor
 				HitBoxCheckBox.IsChecked = false;
 			if (ProjectileSpawnCheckBox != null && ProjectileSpawnCheckBox.IsChecked != null)
 				ProjectileSpawnCheckBox.IsChecked = false;
+		}
+
+		private void PopUpCheckBox_Checked(object sender, RoutedEventArgs e)
+		{
+			StateAnimation selectedAnimation = GetCurrentStateAnimation();
+			if (selectedAnimation != null)
+			{
+				if (ListOfAnimationInformationBoxes.SelectedItem != null)
+				{
+					ListBoxItem selectedAnimationInformationBoxItem = (ListBoxItem)ListOfAnimationInformationBoxes.SelectedItem;
+					string selectedAnimationInformationBoxName = selectedAnimationInformationBoxItem.Content.ToString();
+					AnimationInformationBox selectedAnimationInformationBox = null;
+
+					if (selectedAnimationInformationBoxName.Contains("Hit"))
+					{
+						selectedAnimationInformationBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
+					}
+
+					if (selectedAnimationInformationBox != null)
+					{
+						selectedAnimationInformationBox.PopUp = PopUpCheckBox.IsChecked.HasValue ? PopUpCheckBox.IsChecked.Value : false;
+					}
+				}
+			}
 		}
 	}
 
@@ -2301,6 +2342,8 @@ namespace UnitEditor
 		public float KnockBackY = 0.0f;
 		public float ProjectileSpeedX = 0.0f;
 		public float ProjectileSpeedY = 0.0f;
+		public int HitStunFrames = 0;
+		public bool PopUp = false;
 
 		public AnimationInformationBox()
 		{
