@@ -110,8 +110,12 @@
 			<TextBox Name="wTextBox" Canvas.Right="5" Canvas.Top="423" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="hLabel"  Canvas.Right="80" Canvas.Top="437">H:</Label>
 			<TextBox Name="hTextBox" Canvas.Right="5" Canvas.Top="441" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
-			<Label Name="DamageLabel"  Canvas.Right="80" Canvas.Top="458">Damage:</Label>
-			<TextBox Name="DamageTextBox" Canvas.Right="5" Canvas.Top="462" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
+			
+			<Label Name="DamageLabel"  Canvas.Right="62" Canvas.Top="458">Damage:</Label>
+			<TextBox Name="DamageTextBox" Canvas.Right="5" Canvas.Top="462" Width="60" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
+			<Label Name="PoiseLabel"  Canvas.Right="177" Canvas.Top="458">Poise:</Label>
+			<TextBox Name="PoiseTextBox" Canvas.Right="120" Canvas.Top="462" Width="60" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
+			
 			<Label Name="KnockBackXLabel"  Canvas.Right="130" Canvas.Top="476">Knock Back X:</Label>
 			<TextBox Name="KnockBackXTextBox" Canvas.Right="80" Canvas.Top="480" Width="50" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="KnockBackYLabel"  Canvas.Right="55" Canvas.Top="476">Y:</Label>

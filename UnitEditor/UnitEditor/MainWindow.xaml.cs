@@ -83,6 +83,25 @@ namespace UnitEditor
 				}
 			}
 
+			if (PoiseTextBox.IsFocused)
+			{
+				ListBoxItem selectedAnimationItem = (ListBoxItem)ListOfStateAnimations.SelectedItem;
+				if (selectedAnimationItem != null)
+				{
+					string selectedAnimationName = selectedAnimationItem.Content.ToString();
+					StateAnimation selectedAnimation = GetCurrentStateAnimation(selectedAnimationName);
+
+					if (selectedAnimation != null)
+					{
+						int poise = 0;
+
+						int.TryParse(PoiseTextBox.Text, out poise);
+
+						selectedAnimation.Poise = poise;
+					}
+				}
+			}
+
 			if (frameWidthTextBox.IsFocused)
 			{
 				if (SelectedUnit != null)
@@ -288,7 +307,7 @@ namespace UnitEditor
 				}
 			}
 
-			if ((DamageTextBox.IsFocused || KnockBackXTextBox.IsFocused || KnockBackYTextBox.IsFocused || ProjectileSpeedXTextBox.IsFocused || ProjectileSpeedYTextBox.IsFocused || HitStunFramesTextBox.IsFocused) && SelectedUnit != null)
+			if ((PoiseTextBox.IsFocused || DamageTextBox.IsFocused || KnockBackXTextBox.IsFocused || KnockBackYTextBox.IsFocused || ProjectileSpeedXTextBox.IsFocused || ProjectileSpeedYTextBox.IsFocused || HitStunFramesTextBox.IsFocused) && SelectedUnit != null)
 			{
 				StateAnimation selectedAnimation = GetCurrentStateAnimation();
 				if (selectedAnimation != null)
@@ -317,6 +336,7 @@ namespace UnitEditor
 							try
 							{
 								int.TryParse(DamageTextBox.Text, out selectedAnimationInformationBox.Damage);
+								int.TryParse(PoiseTextBox.Text, out selectedAnimation.Poise);
 								float.TryParse(KnockBackXTextBox.Text, out selectedAnimationInformationBox.KnockBackX);
 								float.TryParse(KnockBackYTextBox.Text, out selectedAnimationInformationBox.KnockBackY);
 								float.TryParse(ProjectileSpeedXTextBox.Text, out selectedAnimationInformationBox.ProjectileSpeedX);
@@ -370,8 +390,6 @@ namespace UnitEditor
 			double maxY = FrameCanvas.ActualHeight / 2.0 - animatedSprite.PixelHeight / 2.0;
 
 			spriteImage.Source = animatedSprite;
-			//spriteImage.Width = animatedSprite.PixelWidth;
-			//spriteImage.Height = animatedSprite.PixelWidth;
 			Canvas.SetLeft(spriteImage, maxX);
 			Canvas.SetTop(spriteImage, maxY);
 
@@ -640,6 +658,7 @@ namespace UnitEditor
 					stateAnimationItem.IsSelected = true;
 
 					numberOfFramesTextBox.Text = unitsStateAnimationList[0].NumberOfFrames.ToString();
+					PoiseTextBox.Text = unitsStateAnimationList[0].Poise.ToString();
 					frameWidthTextBox.Text = unitsStateAnimationList[0].FrameDimensionsX.ToString();
 					frameHeightTextBox.Text = unitsStateAnimationList[0].FrameDimensionsY.ToString();
 					framesPerRowTextBox.Text = unitsStateAnimationList[0].FramesPerRow.ToString();
@@ -769,6 +788,7 @@ namespace UnitEditor
 			StateAnimation anim = GetCurrentStateAnimation(name);
 
 			numberOfFramesTextBox.Text = anim.NumberOfFrames.ToString();
+			PoiseTextBox.Text = anim.Poise.ToString();
 			frameWidthTextBox.Text = anim.FrameDimensionsX.ToString();
 			frameHeightTextBox.Text = anim.FrameDimensionsY.ToString();
 			framesPerRowTextBox.Text = anim.FramesPerRow.ToString();
@@ -801,6 +821,11 @@ namespace UnitEditor
 					anim.NumberOfFrames = result;
 				}
 
+				if (int.TryParse(PoiseTextBox.Text, out result))
+				{
+					anim.Poise = result;
+				}
+
 				if (int.TryParse(frameWidthTextBox.Text, out result))
 				{
 					anim.FrameDimensionsX = result;
@@ -829,6 +854,7 @@ namespace UnitEditor
 			ListOfAnimationInformationBoxes.Items.Clear();
 			FrameCanvas.Children.Clear();
 			numberOfFramesTextBox.Text = "";
+			PoiseTextBox.Text = "";
 			frameWidthTextBox.Text = "";
 			frameHeightTextBox.Text = "";
 			framesPerRowTextBox.Text = "";
@@ -1020,6 +1046,7 @@ namespace UnitEditor
 				wTextBox.Text = newAnimationInformationBox.Box.Width.ToString();
 				hTextBox.Text = newAnimationInformationBox.Box.Height.ToString();
 				DamageTextBox.Text = newAnimationInformationBox.Damage.ToString();
+				PoiseTextBox.Text = anim.Poise.ToString();
 				KnockBackXTextBox.Text = newAnimationInformationBox.KnockBackX.ToString();
 				KnockBackYTextBox.Text = newAnimationInformationBox.KnockBackY.ToString();
 				ProjectileSpeedXTextBox.Text = newAnimationInformationBox.ProjectileSpeedX.ToString();
@@ -1481,6 +1508,25 @@ namespace UnitEditor
 				if (int.TryParse(numberOfFramesTextBox.Text, out frames))
 				{
 					return frames;
+				}
+
+				return 1;
+			}
+		}
+
+		private int Poise
+		{
+			get
+			{
+				if (PoiseTextBox.Text == string.Empty)
+				{
+					return 0;
+				}
+
+				int poise = 1;
+				if (int.TryParse(PoiseTextBox.Text, out poise))
+				{
+					return poise;
 				}
 
 				return 1;
@@ -2292,6 +2338,7 @@ namespace UnitEditor
 		public int FrameDimensionsY = 0;
 		public int FramesPerRow = 0;
 		public int FramesPerColumn = 0;
+		public int Poise = 0;
 		public List<string> AttackSoundFilePerFrame = new List<string>();
 		public List<string> RightFootSoundFilePerFrame = new List<string>();
 		public List<string> LeftFootSoundFilePerFrame = new List<string>();
