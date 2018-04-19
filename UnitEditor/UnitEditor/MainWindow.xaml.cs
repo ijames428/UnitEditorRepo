@@ -883,6 +883,7 @@ namespace UnitEditor
 				HitPointsTextBox.Text = SelectedUnit.HitPoints.ToString();
 				MovementSpeedTextBox.Text = SelectedUnit.MovementSpeed.ToString();
 				InteractionRadiusTextBox.Text = SelectedUnit.InteractionRadius.ToString();
+				FlyingCheckBox.IsChecked = SelectedUnit.Flying;
 
 				JumpingSoundFileTextBox.Text = SelectedUnit.JumpingSoundFile;
 				LandingSoundFileTextBox.Text = SelectedUnit.LandingSoundFile;
@@ -1024,6 +1025,7 @@ namespace UnitEditor
 				newAnimationInformationBox.HitStunFrames = 0;
 				newAnimationInformationBox.Frame = CurrentFrame;
 				newAnimationInformationBox.PopUp = false;
+				newAnimationInformationBox.ArcProjectile = false;
 
 				string box_type = "";
 				if (HitBoxCheckBox.IsChecked.HasValue && HitBoxCheckBox.IsChecked.Value)
@@ -1053,6 +1055,7 @@ namespace UnitEditor
 				ProjectileSpeedYTextBox.Text = newAnimationInformationBox.ProjectileSpeedY.ToString();
 				HitStunFramesTextBox.Text = newAnimationInformationBox.HitStunFrames.ToString();
 				PopUpCheckBox.IsChecked = newAnimationInformationBox.PopUp;
+				ArcProjectileCheckBox.IsChecked = newAnimationInformationBox.ArcProjectile;
 
 				rect_getting_drawn = null;
 			}
@@ -1200,6 +1203,7 @@ namespace UnitEditor
 				}
 
 				previouslySelectedAnimationInformationBox.PopUp = PopUpCheckBox.IsChecked.HasValue ? PopUpCheckBox.IsChecked.Value : false;
+				previouslySelectedAnimationInformationBox.ArcProjectile = ArcProjectileCheckBox.IsChecked.HasValue ? ArcProjectileCheckBox.IsChecked.Value : false;
 			}
 		}
 
@@ -1226,6 +1230,7 @@ namespace UnitEditor
 				ProjectileSpeedYTextBox.IsEnabled = true;
 				HitStunFramesTextBox.IsEnabled = true;
 				PopUpCheckBox.IsEnabled = true;
+				ArcProjectileCheckBox.IsEnabled = true;
 			}
 			else if (item.Content.ToString().Contains("Hurt"))
 			{
@@ -1238,6 +1243,7 @@ namespace UnitEditor
 				ProjectileSpeedYTextBox.IsEnabled = false;
 				HitStunFramesTextBox.IsEnabled = false;
 				PopUpCheckBox.IsEnabled = false;
+				ArcProjectileCheckBox.IsEnabled = false;
 			}
 			else if (item.Content.ToString().Contains("Projectile Spawn"))
 			{
@@ -1250,6 +1256,7 @@ namespace UnitEditor
 				ProjectileSpeedYTextBox.IsEnabled = false;
 				HitStunFramesTextBox.IsEnabled = false;
 				PopUpCheckBox.IsEnabled = false;
+				ArcProjectileCheckBox.IsEnabled = false;
 			}
 
 			for (int i = 0; i < listOfBoxes[CurrentFrame].Count; i++)
@@ -1269,6 +1276,7 @@ namespace UnitEditor
 					ProjectileSpeedYTextBox.Text = box.ProjectileSpeedY.ToString();
 					HitStunFramesTextBox.Text = box.HitStunFrames.ToString();
 					PopUpCheckBox.IsChecked = box.PopUp;
+					ArcProjectileCheckBox.IsChecked = box.ArcProjectile;
 
 					break;
 				}
@@ -1965,6 +1973,7 @@ namespace UnitEditor
 						newAnimationInformationBox.ProjectileSpeedY = origAnimationInformationBox.ProjectileSpeedY;
 						newAnimationInformationBox.HitStunFrames = origAnimationInformationBox.HitStunFrames;
 						newAnimationInformationBox.PopUp = origAnimationInformationBox.PopUp;
+						newAnimationInformationBox.ArcProjectile = origAnimationInformationBox.ArcProjectile;
 						newAnimationInformationBox.Frame = CurrentFrame + 1;
 
 						AddNewAnimationInformationBox(selectedAnimation, newAnimationInformationBox, CurrentFrame + 1, selectedAnimationInformationBoxName, false);
@@ -2226,6 +2235,7 @@ namespace UnitEditor
 							newAnimationInformationBox.ProjectileSpeedY = origAnimationInformationBox.ProjectileSpeedY; 
 							newAnimationInformationBox.HitStunFrames = origAnimationInformationBox.HitStunFrames;
 							newAnimationInformationBox.PopUp = origAnimationInformationBox.PopUp;
+							newAnimationInformationBox.ArcProjectile = origAnimationInformationBox.ArcProjectile;
 							newAnimationInformationBox.Frame = i;
 
 							AddNewAnimationInformationBox(selectedAnimation, newAnimationInformationBox, i, selectedAnimationInformationBoxName, false);
@@ -2282,6 +2292,42 @@ namespace UnitEditor
 				}
 			}
 		}
+
+		private void FlyingCheckBox_Checked(object sender, RoutedEventArgs e)
+		{
+			if (SelectedUnit != null)
+			{
+				SelectedUnit.Flying = FlyingCheckBox.IsChecked.HasValue ? FlyingCheckBox.IsChecked.Value : false;
+			}
+		}
+
+		private void ArcProjectileCheckBox_Checked(object sender, RoutedEventArgs e)
+		{
+			StateAnimation selectedAnimation = GetCurrentStateAnimation();
+			if (selectedAnimation != null)
+			{
+				if (ListOfAnimationInformationBoxes.SelectedItem != null)
+				{
+					ListBoxItem selectedAnimationInformationBoxItem = (ListBoxItem)ListOfAnimationInformationBoxes.SelectedItem;
+					string selectedAnimationInformationBoxName = selectedAnimationInformationBoxItem.Content.ToString();
+					AnimationInformationBox selectedAnimationInformationBox = null;
+
+					if (selectedAnimationInformationBoxName.Contains("Hit"))
+					{
+						selectedAnimationInformationBox = selectedAnimation.HitBoxPerFrame[CurrentFrame].Where(x => x.Name == selectedAnimationInformationBoxName).First();
+					}
+
+					if (selectedAnimationInformationBox != null)
+					{
+						selectedAnimationInformationBox.ArcProjectile = ArcProjectileCheckBox.IsChecked.HasValue ? ArcProjectileCheckBox.IsChecked.Value : false;
+					}
+					else
+					{
+						ArcProjectileCheckBox.IsChecked = false;
+					}
+				}
+			}
+		}
 	}
 
 	public class Bestiary
@@ -2301,6 +2347,7 @@ namespace UnitEditor
 		public int HitPoints = 0;
 		public float MovementSpeed = 0.0f;
 		public float InteractionRadius = 0.0f;
+		public bool Flying = false;
 		
 		public string JumpingSoundFile = "";
 		public string LandingSoundFile = "";
@@ -2391,6 +2438,7 @@ namespace UnitEditor
 		public float ProjectileSpeedY = 0.0f;
 		public int HitStunFrames = 0;
 		public bool PopUp = false;
+		public bool ArcProjectile = false;
 
 		public AnimationInformationBox()
 		{

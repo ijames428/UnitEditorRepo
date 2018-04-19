@@ -86,6 +86,8 @@
 			<TextBox Name="MovementSpeedTextBox" Canvas.Left="123" Canvas.Top="260" Width="120" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<Label Name="InteractionRadiusLabel" Canvas.Left="10" Canvas.Top="274">Interaction Radius:</Label>
 			<TextBox Name="InteractionRadiusTextBox" Canvas.Left="123" Canvas.Top="278" Width="120" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
+
+			<CheckBox Name="FlyingCheckBox" Checked="FlyingCheckBox_Checked" Canvas.Left="190" Canvas.Top="300" IsChecked="False">Flying</CheckBox>
 			<!--Label Name="frameWidthLabel" Canvas.Right="82" Canvas.Top="396">Frame Width:</Label-->
 			<!--TextBox Name="frameWidthTextBox" Canvas.Right="10" Canvas.Top="400" Width="75"></TextBox-->
 			<!--Label Name="frameHeightLabel"  Canvas.Right="82" Canvas.Top="414">Frame Height:</Label-->
@@ -123,6 +125,7 @@
 			<Label Name="HitStunFramesLabel"  Canvas.Right="80" Canvas.Top="494">Hit Stun Frames:</Label>
 			<TextBox Name="HitStunFramesTextBox" Canvas.Right="5" Canvas.Top="498" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
 			<CheckBox Name="PopUpCheckBox" Checked="PopUpCheckBox_Checked" Canvas.Right="125" Canvas.Top="780" IsChecked="False">Pop Up Move</CheckBox>
+			<CheckBox Name="ArcProjectileCheckBox" Checked="ArcProjectileCheckBox_Checked" Canvas.Right="127" Canvas.Top="800" IsChecked="False">Arc Projectile</CheckBox>
 
 			<Label Name="ProjectileSpeedXLabel"  Canvas.Right="80" Canvas.Top="516">Projectile Speed X:</Label>
 			<TextBox Name="ProjectileSpeedXTextBox" Canvas.Right="5" Canvas.Top="520" Width="75" GotKeyboardFocus="SelectAllText" PreviewMouseLeftButtonDown="SelectivelyHandleMouseButton"></TextBox>
