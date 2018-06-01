@@ -37,6 +37,7 @@
 				<ListBoxItem Name="TalkingState" Content="Talking" Selected="OnStateSelected"></ListBoxItem>
 				<ListBoxItem Name="ProjectileActiveState" Content="Projectile Active" Selected="OnStateSelected"></ListBoxItem>
 				<ListBoxItem Name="ProjectileHitState" Content="Projectile Hit" Selected="OnStateSelected"></ListBoxItem>
+				<ListBoxItem Name="MiscellaneousState" Content="Miscellaneous" Selected="OnStateSelected"></ListBoxItem>
 			</ListBox>
 
 			<Button Name="AddAnimationButton" Height="25" Width="120" Click="AddAnimationButton_Click" Canvas.Right="120" Canvas.Top="593" Canvas.Left="0">Add Animation</Button>

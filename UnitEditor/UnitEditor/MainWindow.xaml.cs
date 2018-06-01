@@ -769,6 +769,10 @@ namespace UnitEditor
 				{
 					unitsStateAnimationList = SelectedUnit.ProjectileHitAnimations;
 				}
+				else if (UnitState == "Miscellaneous")
+				{
+					unitsStateAnimationList = SelectedUnit.MiscellaneousAnimations;
+				}
 
 				return unitsStateAnimationList;
 			}
@@ -1383,8 +1387,9 @@ namespace UnitEditor
 					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.FallingAnimations);
 					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.LandingAnimations);
 					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.TalkingAnimations);
-					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.ProjectileActiveAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.ProjectileActiveAnimations); 
 					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.ProjectileHitAnimations);
+					AddListBoxItemsForThisAnimationsAnimationInformationBoxes(unit.MiscellaneousAnimations);
 				}
 
 				FrameCanvas.Children.Clear();
@@ -2368,6 +2373,7 @@ namespace UnitEditor
 		public List<StateAnimation> TalkingAnimations = new List<StateAnimation>();
 		public List<StateAnimation> ProjectileActiveAnimations = new List<StateAnimation>();
 		public List<StateAnimation> ProjectileHitAnimations = new List<StateAnimation>();
+		public List<StateAnimation> MiscellaneousAnimations = new List<StateAnimation>();
 
 		public Unit()
 		{
